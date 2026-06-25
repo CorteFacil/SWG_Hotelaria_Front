@@ -1,5 +1,10 @@
+import root from 'react-shadow';
+import bootstrapCss from 'bootstrap/dist/css/bootstrap.min.css?inline';
+
 export default function AdminFuncionarioPage(){
   return (
+    <root.div>
+    <style>{bootstrapCss}</style>    
     <body className="d-flex flex-column min-vh-100 bg-dark-subtle">
       <form className="container bg-light p-4 md-2">
         <h2>Cadastro de Funcionário</h2>
@@ -67,6 +72,6 @@ export default function AdminFuncionarioPage(){
     </div>
 </form>
 </body>
-
+</root.div>
   )
 }

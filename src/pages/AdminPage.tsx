@@ -17,7 +17,7 @@ export default function AdminPage({ children }: AdminProps) {
 
   return (
     // Adicionamos a classe font-sans aqui para forçar a tipografia limpa em todo o painel
-    <div className={`${styles.adminShell} font-sans text-gray-800 bg-gray-50 min-h-screen`}>
+  <div className={`${styles.adminShell} admin-panel bg-gray-50 min-h-screen text-gray-800`}>
       <div className={styles.adminGrid}>
         <aside className={styles.sidebar}>
           <div className={styles.menuSection}>

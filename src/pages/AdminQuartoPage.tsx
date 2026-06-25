@@ -1,6 +1,11 @@
+import root from 'react-shadow';
+import bootstrapCss from 'bootstrap/dist/css/bootstrap.min.css?inline';
+
 export default function AdminQuartoPage(){
   return (
-   <form action="" className="container bg-light p-4">
+    <root.div>
+    <style>{bootstrapCss}</style>
+      <form action="" className="container bg-light p-4">
         <label htmlFor="" className="form-label mb-4"><h2>Cadastro de Quarto</h2></label>
         <div className="row g-3 bg-secondary bg-opacity-10">
             <div className="col-md-4">
@@ -32,5 +37,6 @@ export default function AdminQuartoPage(){
             </div>    
         </div>
     </form>
+    </root.div>
   )
 }

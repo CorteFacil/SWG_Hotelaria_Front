@@ -3,6 +3,8 @@ import { type OrdemLimpeza, type Funcionario, type Quarto } from "../types";
 import { api } from "../api";
 import styles from './Page.module.css'
 import OrdemLimpezaForm from "../components/OrdemLimpezaForm";
+import root from 'react-shadow';
+import bootstrapCss from 'bootstrap/dist/css/bootstrap.min.css?inline';
 
 
 function OrdemLimpezaPage() {
@@ -44,6 +46,8 @@ function OrdemLimpezaPage() {
       }
 
       return (
+      <root.div>
+      <style>{bootstrapCss}</style>
          <div>
       <h1>Ordem de Limpeza</h1>
       <p>Cadastre as ordens de limpezas vinculando aos funcionários e quartos já cadastrados.</p>
@@ -70,6 +74,7 @@ function OrdemLimpezaPage() {
         </section>
       </div>
     </div>
+  </root.div>
   )
 }
 

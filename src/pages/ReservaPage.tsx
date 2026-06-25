@@ -184,7 +184,7 @@ export default function ReservaPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#FFF8EF] text-[#222020] flex flex-col font-body relative">
+    <div className="min-h-screen w-full bg-[#FFF8EF] text-[#222020] flex flex-col font-admin admin-panel relative">
       <Navbar />
       
       {/* pt-28 garante que o conteúdo não fique escondido sob a Navbar fixada */}

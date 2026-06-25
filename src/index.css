@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
 
 @import "tailwindcss";
 
@@ -106,6 +107,8 @@
   --font-script: 'Great Vibes', cursive;
   --font-body: 'DM Sans', sans-serif;
   --app-font-sans: 'DM Sans', sans-serif;
+
+  --font-admin: 'Poppins', sans-serif;
 
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
@@ -228,8 +231,21 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 
+  /* Títulos públicos (Mantém a Playfair) */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+  }
+
+  /* Títulos do Painel Administrativo (Força Poppins SemiBold) */
+  .admin-panel h1,
+  .admin-panel h2,
+  .admin-panel h3,
+  .admin-panel h4,
+  .admin-panel h5,
+  .admin-panel h6 {
+    font-family: var(--font-admin);
+    font-weight: 600; /* Mude para 300 se preferir a versão Light */
+    letter-spacing: normal;
   }
 }
 
@@ -237,6 +253,7 @@
   .font-display { font-family: var(--font-display); }
   .font-script { font-family: var(--font-script); }
   .font-body { font-family: var(--font-body); }
+  .font-admin { font-family: var(--font-admin); }
   
   .text-amber { color: var(--color-amber); }
   .bg-amber { background-color: var(--color-amber); }

@@ -85,9 +85,11 @@ export interface Funcionario {
 }
 
 export interface OrdemLimpeza {
-  id: number
-  dataLimpeza: string
-  horaLimpeza: string
-  quartoId: number
-  status: number
+  id: number;
+  status: string;
+  observacao?: string;
+  inicioOrdem: string;
+  fimOrdem: string;
+  funcionarioId: number;
+  quartoId: number;
 }
