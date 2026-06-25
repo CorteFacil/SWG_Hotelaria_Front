@@ -1,5 +1,7 @@
-import { useEffect, useState, type SyntheticEvent } from 'react'
+import { useState, type SyntheticEvent } from 'react'
 import type { Quarto, Funcionario } from '../types'
+import root from 'react-shadow';
+import bootstrapCss from 'bootstrap/dist/css/bootstrap.min.css?inline';
 
 
 interface OrdemLimpezaFormProps {
@@ -36,7 +38,9 @@ function OrdemLimpezaForm({ funcionarios, quartos, onSubmit} : OrdemLimpezaFormP
     }
 
     return (
-    <form className="container bg-light p-4">
+    <root.div>
+    <style>{bootstrapCss}</style>
+    <form onSubmit={handleSubmit} className="container bg-light p-4">
     <h2>Cadastro de Ordem de Limpeza</h2>
     <br/>
     <div className="row g-3 bg-secondary bg-opacity-10">
@@ -50,7 +54,7 @@ function OrdemLimpezaForm({ funcionarios, quartos, onSubmit} : OrdemLimpezaFormP
                 id="quarto">
                 <option value="">Selecione</option>
                 {quartos.map((map) => (
-                    <option key={map.id} value={map.id}>{map.numeroQuarto}</option>
+                    <option key={map.id} value={map.id}>{map.numero}</option>
                 ))}
             </select>
             <div className="invalid-feedback">Campo obrigatório</div>
@@ -101,6 +105,7 @@ function OrdemLimpezaForm({ funcionarios, quartos, onSubmit} : OrdemLimpezaFormP
         </div>
     </div>
     </form>
+    </root.div>
     )
 
 }
