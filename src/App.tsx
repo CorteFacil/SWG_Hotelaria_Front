@@ -7,12 +7,15 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import HospedePage from './pages/HospedePage';
 import ReservaPage from './pages/ReservaPage';
-import TipoDeQuartoPage from './pages/TipoDeQuartoPage';
+import TipoDeQuartoAdminPage from './pages/TipoDeQuartoAdminPage';
 import AdminPage from './pages/AdminPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminFuncionarioPage from './pages/AdminFuncionarioPage';
 import AdminQuartoPage from './pages/AdminQuartoPage';
 import OrdemLimpezaPage from './pages/OrdemLimpezaPage';
+import ReservaAdminPage from "./pages/ReservaAdminPage";
+import EstadoPage from './pages/EstadoPage';
+//import EstadiaPage from './pages/EstadiaPage';
 
 const queryClient = new QueryClient();
 
@@ -23,6 +26,7 @@ function Router() {
       <Route path="/hospede" component={HospedePage} />
       <Route path="/reserva" component={ReservaPage} />
       <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/estado" component={EstadoPage} />
       
       <Route path="/admin">
         <AdminPage><h2>Bem-vindo ao Painel</h2></AdminPage>
@@ -36,12 +40,21 @@ function Router() {
       <Route path="/admin/quarto">
         <AdminPage><AdminQuartoPage /></AdminPage>
       </Route>
+      <Route path="/admin/reservas">
+        <AdminPage><ReservaAdminPage /></AdminPage>
+      </Route>
       <Route path="/admin/hospedes">
         <AdminPage><HospedePage /></AdminPage>
       </Route>
       <Route path="/admin/tipos-de-quarto">
-        <AdminPage><TipoDeQuartoPage /></AdminPage>
+        <AdminPage><TipoDeQuartoAdminPage /></AdminPage>
       </Route>
+      <Route path="/admin/estado">
+        <AdminPage><EstadoPage /></AdminPage>
+      </Route>
+      {/* <Route path="/admin/Estadia">
+        <AdminPage><EstadiaPage /></AdminPage>
+      </Route> */}
 
       <Route component={NotFound} />
     </Switch>
