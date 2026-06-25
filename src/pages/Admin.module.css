@@ -1,9 +1,11 @@
 /* Layout Principal */
 .adminShell { 
-  max-width: 1200px; 
+  width: 100%; 
   margin: 0 auto; 
   padding: 32px 24px; 
   min-height: 100vh;
+  background-color: #FFF8EF; /* --color-cream */
+  color: #222020; /* --color-charcoal */
 }
 
 .adminGrid { 
@@ -14,25 +16,26 @@
 
 /* Barra Lateral */
 .sidebar { 
-  background: #fff; 
+  background: #FFF3E3; /* --color-surface-card */
   border-radius: 16px; 
   padding: 24px; 
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(239, 155, 27, 0.15); /* Borda sutil de âmbar */
   height: fit-content;
+  box-shadow: 0 4px 20px rgba(34, 32, 32, 0.03);
 }
 
-.menuSection { margin-bottom: 24px }
+.menuSection { margin-bottom: 24px; }
 
 .menuSection h3 { 
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6b7280;
+  color: #C47D0E; /* --color-amber-dark */
   margin-bottom: 12px;
   font-weight: 700;
 }
 
-/* Botões do Menu (Links do Wouter) */
+/* Botões do Menu */
 .menuButton { 
   display: block; 
   width: 100%; 
@@ -40,47 +43,52 @@
   padding: 10px 12px; 
   border-radius: 8px; 
   text-decoration: none;
-  color: #374151;
+  color: #222020; /* --color-charcoal */
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.2s ease-in-out;
   border: 1px solid transparent;
 }
 
+/* Efeito ao passar o mouse */
 .menuButton:hover { 
-  background: #f9fafb;
-  color: #111;
+  background: rgba(239, 155, 27, 0.1); /* Fundo âmbar bem clarinho */
+  color: #C47D0E; /* --color-amber-dark */
+  transform: translateX(4px); /* Pequeno salto para a direita, super moderno */
 }
 
-/* Estilo para link ativo (Opcional: adicione se quiser destacar a página atual) */
-.menuButton:active {
-  background: #fef3c7;
-  color: #b45309;
+/* Botão de Sair Customizado */
+.logoutButton {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #EF9B1B; /* --color-amber */
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  background: transparent;
+}
+
+.logoutButton:hover {
+  background: rgba(239, 155, 27, 0.1);
+  color: #C47D0E;
 }
 
 /* Área de Conteúdo */
 .contentArea { 
-  background: #fff; 
+  background: #FFFFFF; /* Fundo branco para os formulários respirarem */
   border-radius: 16px; 
   padding: 32px; 
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(34, 32, 32, 0.05); 
   min-height: 400px;
-}
-
-/* Cartões de Atalho */
-.cardRow { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
-
-.card { 
-  padding: 20px; 
-  border-radius: 12px; 
-  border: 1px solid #e5e7eb; 
-  background: #fff; 
-  flex: 1;
-  min-width: 200px;
+  box-shadow: 0 10px 30px rgba(34, 32, 32, 0.04);
 }
 
 /* Responsividade */
 @media (max-width: 900px) {
-  .adminGrid { grid-template-columns: 1fr }
+  .adminGrid { grid-template-columns: 1fr; }
   .sidebar { display: flex; flex-wrap: wrap; gap: 10px; }
   .menuSection { flex: 1 1 200px; }
 }
