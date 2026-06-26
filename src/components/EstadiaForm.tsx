@@ -1,11 +1,12 @@
-import { useState, type FormEvent } from 'react'
-import type { Reserva, Funcionario, Quarto } from '../types'
+import { useState, useEffect, type FormEvent } from 'react'
+import type { Reserva, Funcionario, Quarto, Estadia } from '../types'
 
 interface EstadiaFormProps {
   reservas: Reserva[]
   funcionarios: Funcionario[]
   quartos: Quarto[]
   error?: string
+  estadiaEditando?: Partial<Estadia> | null
   onSubmit: (data: any) => void
   onCancel: () => void
 }
@@ -15,6 +16,7 @@ export default function EstadiaForm({
   funcionarios,
   quartos,
   error,
+  estadiaEditando,
   onSubmit,
   onCancel
 }: EstadiaFormProps) {
@@ -26,20 +28,34 @@ export default function EstadiaForm({
   const [funcionarioId, setFuncionarioId] = useState('')
   const [quartoId, setQuartoId] = useState('')
 
+  // Dependência em estadiaEditando?.id para disparar só quando mudar de estadia,
+  // e lida com os dois formatos da API: campo direto (reservaId) ou aninhado (reserva.id)
+  useEffect(() => {
+    if (estadiaEditando) {
+      setCheckIn((estadiaEditando.checkIn ?? '').split('T')[0])
+      setCheckOut((estadiaEditando.checkOut ?? '').split('T')[0])
+      setValorTotalEstadia(String(estadiaEditando.valorTotalEstadia ?? ''))
+      setReservaId(String(estadiaEditando.reservaId ?? estadiaEditando.reserva?.id ?? ''))
+      setFuncionarioId(String(estadiaEditando.funcionarioId ?? estadiaEditando.funcionario?.id ?? ''))
+      setQuartoId(String(estadiaEditando.quartoId ?? estadiaEditando.quarto?.id ?? ''))
+    } else {
+      setCheckIn('')
+      setCheckOut('')
+      setValorTotalEstadia('')
+      setReservaId('')
+      setFuncionarioId('')
+      setQuartoId('')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [estadiaEditando?.id])
+
   const getErro = (palavrasChave: string[]) => {
     if (!error) return null
-
     const sentencas = error.match(/[^.!?]+[.!?]+/g) || [error]
-
     const encontradas = sentencas.filter((s) =>
-      palavrasChave.some((p) =>
-        s.toLowerCase().includes(p.toLowerCase())
-      )
+      palavrasChave.some((p) => s.toLowerCase().includes(p.toLowerCase()))
     )
-
-    return encontradas.length > 0
-      ? encontradas.join(' ').trim()
-      : null
+    return encontradas.length > 0 ? encontradas.join(' ').trim() : null
   }
 
   const erroCheckIn = getErro(['check-in'])
@@ -51,20 +67,13 @@ export default function EstadiaForm({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-
     onSubmit({
       checkIn,
       checkOut,
       valorTotalEstadia: Number(valorTotalEstadia),
-      reserva: {
-        id: Number(reservaId)
-      },
-      funcionario: {
-        id: Number(funcionarioId)
-      },
-      quarto: {
-        id: Number(quartoId)
-      }
+      reservaId: Number(reservaId),
+      funcionarioId: Number(funcionarioId),
+      quartoId: Number(quartoId),
     })
   }
 
@@ -75,8 +84,13 @@ export default function EstadiaForm({
     >
       <div className="text-center mb-6">
         <h2 className="text-2xl font-display font-black text-[#EF9B1B]">
-          Nova Estadia
+          {estadiaEditando ? 'Editar Estadia' : 'Nova Estadia'}
         </h2>
+        {estadiaEditando && (
+          <p className="text-xs text-blue-600 mt-1 font-medium">
+            Modo de edição ativo · Altere os campos desejados e salve.
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
@@ -85,7 +99,6 @@ export default function EstadiaForm({
           <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">
             Check-in
           </label>
-
           <input
             type="date"
             value={checkIn}
@@ -97,17 +110,13 @@ export default function EstadiaForm({
                 : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
             }`}
           />
-
-          {erroCheckIn && (
-            <span className="text-xs text-red-500">{erroCheckIn}</span>
-          )}
+          {erroCheckIn && <span className="text-xs text-red-500">{erroCheckIn}</span>}
         </div>
 
         <div className="space-y-1">
           <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">
             Check-out
           </label>
-
           <input
             type="date"
             value={checkOut}
@@ -119,17 +128,13 @@ export default function EstadiaForm({
                 : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
             }`}
           />
-
-          {erroCheckOut && (
-            <span className="text-xs text-red-500">{erroCheckOut}</span>
-          )}
+          {erroCheckOut && <span className="text-xs text-red-500">{erroCheckOut}</span>}
         </div>
 
         <div className="space-y-1 md:col-span-2">
           <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">
             Valor Total da Estadia
           </label>
-
           <input
             type="number"
             step="0.01"
@@ -144,17 +149,13 @@ export default function EstadiaForm({
                 : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
             }`}
           />
-
-          {erroValor && (
-            <span className="text-xs text-red-500">{erroValor}</span>
-          )}
+          {erroValor && <span className="text-xs text-red-500">{erroValor}</span>}
         </div>
 
         <div className="space-y-1">
           <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">
             Reserva
           </label>
-
           <select
             value={reservaId}
             onChange={(e) => setReservaId(e.target.value)}
@@ -166,24 +167,19 @@ export default function EstadiaForm({
             }`}
           >
             <option value="">Selecione</option>
-
             {reservas.map((reserva) => (
               <option key={reserva.id} value={reserva.id}>
-                Reserva #{reserva.id}
+                Reserva #{reserva.id}{reserva.hospede ? ` — ${reserva.hospede.nome}` : ''}
               </option>
             ))}
           </select>
-
-          {erroReserva && (
-            <span className="text-xs text-red-500">{erroReserva}</span>
-          )}
+          {erroReserva && <span className="text-xs text-red-500">{erroReserva}</span>}
         </div>
 
         <div className="space-y-1">
           <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">
             Funcionário
           </label>
-
           <select
             value={funcionarioId}
             onChange={(e) => setFuncionarioId(e.target.value)}
@@ -195,24 +191,19 @@ export default function EstadiaForm({
             }`}
           >
             <option value="">Selecione</option>
-
             {funcionarios.map((funcionario) => (
               <option key={funcionario.id} value={funcionario.id}>
                 {funcionario.nome}
               </option>
             ))}
           </select>
-
-          {erroFuncionario && (
-            <span className="text-xs text-red-500">{erroFuncionario}</span>
-          )}
+          {erroFuncionario && <span className="text-xs text-red-500">{erroFuncionario}</span>}
         </div>
 
         <div className="space-y-1 md:col-span-2">
           <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">
             Quarto
           </label>
-
           <select
             value={quartoId}
             onChange={(e) => setQuartoId(e.target.value)}
@@ -224,19 +215,18 @@ export default function EstadiaForm({
             }`}
           >
             <option value="">Selecione</option>
-
             {quartos
-              .filter((quarto) => quarto.status_quarto === 'Disponivel')
+              .filter((quarto) =>
+                quarto.status_quarto === 'Disponivel' || String(quarto.id) === quartoId
+              )
               .map((quarto) => (
                 <option key={quarto.id} value={quarto.id}>
                   Quarto {quarto.numero} - {quarto.tipoDeQuarto?.nome}
+                  {quarto.status_quarto !== 'Disponivel' ? ` (${quarto.status_quarto})` : ''}
                 </option>
               ))}
           </select>
-
-          {erroQuarto && (
-            <span className="text-xs text-red-500">{erroQuarto}</span>
-          )}
+          {erroQuarto && <span className="text-xs text-red-500">{erroQuarto}</span>}
         </div>
 
       </div>
@@ -249,7 +239,6 @@ export default function EstadiaForm({
         >
           Cancelar
         </button>
-
         <button
           type="submit"
           className="flex-1 py-2.5 rounded-lg font-medium bg-[#EF9B1B] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:scale-95 transition-all"
