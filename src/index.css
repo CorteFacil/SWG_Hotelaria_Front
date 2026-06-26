@@ -223,20 +223,29 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(239, 155, 27, 0.3); /* Tom âmbar suave */
+    border-radius: 10px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(239, 155, 27, 0.7); /* Fica mais forte ao passar o mouse */
   }
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
 
-  /* Títulos públicos (Mantém a Playfair) */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
   }
 
-  /* Títulos do Painel Administrativo (Força Poppins SemiBold) */
   .admin-panel h1,
   .admin-panel h2,
   .admin-panel h3,
@@ -244,7 +253,7 @@
   .admin-panel h5,
   .admin-panel h6 {
     font-family: var(--font-admin);
-    font-weight: 600; /* Mude para 300 se preferir a versão Light */
+    font-weight: 600;
     letter-spacing: normal;
   }
 }
@@ -261,20 +270,6 @@
   .text-amber { color: var(--color-amber); }
   .bg-amber { background-color: var(--color-amber); }
 
-  .custom-scroll::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-.custom-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(239, 155, 27, 0.3); /* Tom âmbar suave */
-  border-radius: 10px;
-}
-.custom-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(239, 155, 27, 0.7); /* Fica mais forte ao passar o mouse */
-}
   
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;

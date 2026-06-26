@@ -71,8 +71,10 @@ export function Navbar() {
 
   return (
     <nav
-      className={`gsap-nav fixed top-0 w-full z-[100] h-[72px] transition-all duration-400 ease-in-out ${
-        scrolled ? "bg-[#FFF8EF] border-b border-black/10 shadow-sm" : "bg-transparent"
+      className={`gsap-nav fixed top-0 w-full z-[100] h-[72px] transition-all duration-300 ease-in-out ${
+        scrolled 
+          ? "bg-[#FFF8EF] border-b border-black/10 shadow-sm" 
+          : "bg-transparent border-transparent"
       }`}
       data-testid="navbar"
     >

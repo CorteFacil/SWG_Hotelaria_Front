@@ -33,7 +33,7 @@ export function RoomsSection() {
       className="w-full bg-[#FFF8EF] py-[clamp(3rem,5vw,5rem)]"
       data-testid="section-rooms"
     >
-      <div className="max-w-[80vw] mx-auto px-6 md:px-10 lg:px-12">
+      <div className="max-w-[1500px] mx-auto w-full px-6 md:px-10 lg:px-12">
         <div className="gsap-section-heading mb-12 md:mb-16">
           <span className="font-body font-medium text-[0.75rem] uppercase tracking-[0.12em] text-[#EF9B1B] block mb-4">
             ACOMODAÇÕES
@@ -46,8 +46,8 @@ export function RoomsSection() {
           </p>
         </div>
 
-        {/* Carousel on mobile, grid on desktop */}
-        <div className="gsap-rooms-container flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 md:gap-8 pb-8 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0 hide-scrollbar">
+        {/* TROCAMOS O 'hide-scrollbar' POR 'custom-scroll' AQUI: */}
+        <div className="gsap-rooms-container flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 md:gap-8 pb-8 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0 custom-scroll">
           {rooms.map((room) => (
             <div 
               key={room.id}
