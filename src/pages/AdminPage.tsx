@@ -103,7 +103,7 @@ export default function AdminPage({ children }: AdminProps) {
         <div className="p-4 border-t border-[#EF9B1B]/10 shrink-0">
           <button 
             onClick={handleLogout}
-            className={`flex items-center gap-3 w-full p-3 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200 group ${isCollapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-3 w-full p-3 rounded-xl text-red-500 hover:bg-red-200 transition-all duration-200 group ${isCollapsed ? 'justify-center' : ''}`}
             title="Sair do sistema"
           >
             <LogOut size={22} className="group-hover:-translate-x-1 transition-transform" />

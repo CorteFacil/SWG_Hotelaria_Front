@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ReservaForm from "../components/ReservaForm";
 import { api } from "../api";
 import type { Hospede, TipoDeQuarto, Reserva } from "../types";
-import { Loader2, UserCircle, Search, CalendarDays, BedDouble, Trash2, AlertTriangle, Edit2, CheckCircle2 } from "lucide-react";
+import { Loader2, UserCircle, Search, CalendarDays, BedDouble, Trash2, AlertTriangle, Edit2, CheckCircle2, UserPlus } from "lucide-react";
 
 export default function ReservaAdminPage() {
   const [tipos, setTipos] = useState<TipoDeQuarto[]>([]);
@@ -180,7 +180,7 @@ export default function ReservaAdminPage() {
                )}
             </div>
 
-            {hospedeSelecionadoId > 0 && (
+            {hospedeSelecionadoId > 0 ? (
               <ReservaForm 
                 tipos={tipos}
                 hospedeId={hospedeSelecionadoId}
@@ -189,6 +189,19 @@ export default function ReservaAdminPage() {
                 onSubmit={handleSubmitForm}
                 onCancel={handleCancel}
               />
+            ) : (
+              // Empty State - Estado Vazio Animado
+              <div className="bg-white border-2 border-dashed border-[#EF9B1B]/30 rounded-[1.25rem] p-10 flex flex-col items-center justify-center text-center min-h-[450px] animate-fade-in shadow-sm">
+                <div className="w-20 h-20 bg-[#FFF8EF] rounded-full flex items-center justify-center mb-6 shadow-inner">
+                  <UserPlus size={36} className="text-[#EF9B1B]" />
+                </div>
+                <h4 className="text-xl font-bold text-[#222020] font-admin mb-3">
+                  Pronto para agendar?
+                </h4>
+                <p className="text-gray-500 text-sm max-w-[280px] leading-relaxed">
+                  Busque e vincule um hóspede no menu acima para liberar o formulário de nova reserva.
+                </p>
+              </div>
             )}
           </div>
 
