@@ -142,8 +142,8 @@ export default function AdminPage({ children }: AdminProps) {
             <div className="flex flex-col gap-1">
               <MenuItem to="/admin/relatorios/relatorio-reservas" icon={<FileText size={22} />} text="Reservas por Período" isCollapsed={isCollapsed && !isMobileOpen} onClick={handleMobileMenuClick} />
               <MenuItem to="/admin/relatorios/relatorio-faturamento" icon={<BarChart3 size={22} />} text="Projeção de Faturamento" isCollapsed={isCollapsed && !isMobileOpen} onClick={handleMobileMenuClick} />
-              <MenuItem to="/admin/relatorios/lucro-estadia" icon={<TrendingUp size={22} />} text="Lucro por Estadia" isCollapsed={isCollapsed && !isMobileOpen} onClick={handleMobileMenuClick} />
-              <MenuItem to="/admin/relatorios/procedencia" icon={<Map size={22} />} text="Procedência Geográfica" isCollapsed={isCollapsed && !isMobileOpen} onClick={handleMobileMenuClick} />
+              <MenuItem to="/admin/relatorios/relatorio-lucro-estadia" icon={<TrendingUp size={22} />} text="Lucro por Estadia" isCollapsed={isCollapsed && !isMobileOpen} onClick={handleMobileMenuClick} />
+              <MenuItem to="/admin/relatorios/relatorio-procedencia" icon={<Map size={22} />} text="Procedência Geográfica" isCollapsed={isCollapsed && !isMobileOpen} onClick={handleMobileMenuClick} />
               <MenuItem to="/admin/relatorios/historico-limpeza" icon={<ClipboardList size={22} />} text="Histórico de Limpezas" isCollapsed={isCollapsed && !isMobileOpen} onClick={handleMobileMenuClick} />
               <MenuItem to="/admin/relatorios/produtividade-limpeza" icon={<Activity size={22} />} text="Produtividade da Equipe" isCollapsed={isCollapsed && !isMobileOpen} onClick={handleMobileMenuClick} />
             </div>

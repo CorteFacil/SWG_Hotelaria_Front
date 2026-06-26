@@ -25,8 +25,9 @@ import DashboardHome from "./pages/DashboardHome";
 
 import EstadiaAdminPage from "./pages/EstadiaAdminPage";
 import EstadoAdminPage from "./pages/EstadoAdminPage";
-
 import QuartoAdminPage from "./pages/QuartoAdminPage";
+import RelatorioLucroEstadiaPage from "./pages/RelatorioLucroEstadiaPage";
+import RelatorioProcedenciaPage from "./pages/RelatorioProcedenciaPage";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,12 @@ function Router() {
       </Route>
       <Route path="/admin/Estadia">
         <AdminPage><EstadiaAdminPage /></AdminPage>
+      </Route>
+      <Route path="/admin/relatorios/relatorio-lucro-estadia">
+        <AdminPage><RelatorioLucroEstadiaPage /></AdminPage>
+      </Route>
+      <Route path="/admin/relatorios/relatorio-procedencia">
+        <AdminPage><RelatorioProcedenciaPage /></AdminPage>
       </Route>
 
       <Route component={NotFound} />

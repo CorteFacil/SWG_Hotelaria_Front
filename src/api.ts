@@ -1,5 +1,6 @@
 import type { Estado, Funcionario, Hospede, OrdemLimpeza, PaisIso, Quarto, Reserva, TipoDeQuarto, Estadia } from './types'
 
+/* const BASE_URL = 'http://localhost:3333' */
 const BASE_URL = 'https://swg-hotelaria-back.onrender.com'
 const headers = { 'Content-Type': 'application/json' }
 
