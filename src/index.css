@@ -262,9 +262,9 @@
   .bg-amber { background-color: var(--color-amber); }
 
   .custom-scroll::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+    width: 6px;
+    height: 6px;
+  }
 .custom-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
