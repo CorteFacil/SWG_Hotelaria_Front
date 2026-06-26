@@ -10,8 +10,8 @@ import AdminLogin from './pages/AdminLogin';
 import AdminFuncionarioPage from './pages/AdminFuncionarioPage';
 import AdminQuartoPage from './pages/AdminQuartoPage';
 import OrdemLimpezaPage from './pages/OrdemLimpezaPage';
-import EstadoPage from './pages/EstadoPage';
-import EstadiaPage from './pages/EstadiaPage';
+import EstadoPage from './pages/EstadoAdminPage';
+import EstadiaPage from './pages/EstadiaAdminPage';
 
 //tracy
 import HospedePage from './pages/HospedePage';
@@ -23,6 +23,11 @@ import HospedeAdminPage from './pages/HospedeAdminPage';
 import ReservaAdminPage from "./pages/ReservaAdminPage";
 import DashboardHome from "./pages/DashboardHome";
 
+import EstadiaAdminPage from "./pages/EstadiaAdminPage";
+import EstadoAdminPage from "./pages/EstadoAdminPage";
+
+import QuartoAdminPage from "./pages/QuartoAdminPage";
+
 const queryClient = new QueryClient();
 
 function Router() {
@@ -32,8 +37,8 @@ function Router() {
       <Route path="/hospede" component={HospedePage} />
       <Route path="/reserva" component={ReservaPage} />
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/estado" component={EstadoPage} />
-      <Route path="/estadia" component={EstadiaPage} /> 
+      {/* <Route path="/estado" component={EstadoPage} /> */}
+      {/* <Route path="/estadia" component={EstadiaPage} />  */}
       
       <Route path="/admin">
         <AdminPage><DashboardHome /></AdminPage>
@@ -45,7 +50,7 @@ function Router() {
         <AdminPage><AdminFuncionarioPage /></AdminPage>
       </Route>
       <Route path="/admin/quarto">
-        <AdminPage><AdminQuartoPage /></AdminPage>
+        <AdminPage><QuartoAdminPage /></AdminPage>
       </Route>
       <Route path="/admin/reservas">
         <AdminPage><ReservaAdminPage /></AdminPage>
@@ -63,10 +68,10 @@ function Router() {
         <AdminPage><RelatorioFaturamentoPage /></AdminPage>
       </Route>
       <Route path="/admin/estado">
-        <AdminPage><EstadoPage /></AdminPage>
+        <AdminPage><EstadoAdminPage /></AdminPage>
       </Route>
       <Route path="/admin/Estadia">
-        <AdminPage><EstadiaPage /></AdminPage>
+        <AdminPage><EstadiaAdminPage /></AdminPage>
       </Route>
 
       <Route component={NotFound} />
