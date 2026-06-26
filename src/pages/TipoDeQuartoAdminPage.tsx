@@ -113,7 +113,7 @@ export default function TipoDeQuartoAdminPage() {
             />
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col overflow-hidden sticky top-6 max-h-[80vh]">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col overflow-hidden sticky top-6 max-h-[75vh]">
             <div className="p-6 border-b border-gray-100 bg-gray-50/50">
               <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Categorias Registradas</h3>
               <div className="relative">
