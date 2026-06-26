@@ -170,7 +170,7 @@ export default function ReservaAdminPage() {
                >
                  <option value="0" disabled>Busque e selecione o hóspede responsável...</option>
                  {hospedes.map((h) => (
-                   <option key={h.id} value={h.id}>{h.nome} (CPF: {h.cpfPassaporte})</option>
+                   <option key={h.id} value={h.id}>{h.nome} (CPF/PAS: {h.cpfPassaporte})</option>
                  ))}
                </select>
                {reservaEditando && (
