@@ -117,7 +117,7 @@ export default function TipoDeQuartoAdminPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto w-full h-screen flex flex-col p-4 animate-fade-in relative">
+    <div className="max-w-7xl mx-auto w-full animate-fade-in relative">
       <div className="mb-4">
         <h1 className="text-3xl font-bold text-[#222020] font-admin">Tipos de Quarto</h1>
         <p className="text-gray-500 mt-1">Gerencie as categorias de acomodação do hotel.</p>
@@ -144,7 +144,7 @@ export default function TipoDeQuartoAdminPage() {
             />
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col h-full overflow-hidden">
+          <div className="bg-white rounded-xl shadow-[0_8px_30px_rgba(34,32,32,0.04)] border border-[#EF9B1B] flex flex-col overflow-hidden sticky top-6 max-h-[75vh]">
             <div className="p-6 border-b border-gray-100 bg-gray-50/50 shrink-0">
               <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Categorias Registradas</h3>
               <div className="relative">
