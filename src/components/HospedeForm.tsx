@@ -1,4 +1,5 @@
 import { useState, type FormEvent, useEffect } from 'react';
+import { UserCircle, FileText, Phone, Mail, CalendarDays, Globe, MapPin } from 'lucide-react';
 import type { Estado, PaisIso } from '../types';
 
 interface HospedeFormProp {
@@ -6,7 +7,7 @@ interface HospedeFormProp {
   paises: PaisIso[] 
   initialDoc?: string 
   error?: string 
-  hospedeEditando?: any // <-- NOVA PROP
+  hospedeEditando?: any
   onSubmit: (data: any) => void
   onCancel: () => void
 }
@@ -28,13 +29,11 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
       setEmail(hospedeEditando.email || '')
       setTelefone(hospedeEditando.telefone || '')
       
-      // Formata a data para exibir no input type="date"
       const formatData = (dataStr: string) => dataStr ? dataStr.split('T')[0] : '';
       setNascimento(formatData(hospedeEditando.nascimento))
       
       setEstadoId(String(hospedeEditando.estadoId || ''))
       
-      // Tenta achar o país baseando-se no estadoId carregado
       if (hospedeEditando.estadoId && estados.length > 0) {
           const estadoVinculado = estados.find(e => e.id === hospedeEditando.estadoId);
           if (estadoVinculado && estadoVinculado.paisisoId) {
@@ -52,7 +51,6 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
       setPaisId('')
     }
   }, [hospedeEditando, initialDoc, estados]); 
-  // Removi aquele pedaço quebrado que estava aqui embaixo!
 
   const getErro = (palavrasChave: string[]) => {
     if (!error) return null;
@@ -103,93 +101,127 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
   }
 
   return (
-    <form className="w-full max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-[#EF9B1B]/20" onSubmit={handleSubmit}>
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-display font-black text-[#EF9B1B]">Completar Cadastro</h2>
+    <div className="bg-white p-6 md:p-8 rounded-[1.25rem] shadow-[0_8px_30px_rgba(34,32,32,0.04)] border border-[#EF9B1B] w-full">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-[#222020] font-admin mb-2 flex items-center gap-2">
+          <UserCircle className="text-[#EF9B1B]" /> {hospedeEditando ? 'Editar Hóspede' : 'Cadastro de Hóspede'}
+        </h2>
+        <p className="text-gray-500 text-sm">Registre os dados pessoais e de contato do cliente.</p>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
-        <div className="space-y-1">
-          <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">Nome Completo</label>
-          <input value={nome} onChange={(e) => setNome(e.target.value)} required type="text" 
-            className={`w-full p-2.5 rounded-lg bg-[#FFF8EF] outline-none transition-all ${
-              erroNome ? 'border border-red-400 focus:border-red-400' : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
-            }`} />
-          {erroNome && <span className="text-xs text-red-500 block mt-1">{erroNome}</span>}
-        </div>
 
-        <div className="space-y-1">
-          <div className="flex justify-between items-center mb-1">
-            <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">Documento</label>
-            <select value={tipoDoc} onChange={(e) => setTipoDoc(e.target.value as 'CPF' | 'Passaporte')} className="text-xs bg-transparent text-[#EF9B1B] font-bold outline-none cursor-pointer">
-              <option value="CPF">CPF</option>
-              <option value="Passaporte">Passaporte</option>
-            </select>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Nome Completo</label>
+            <div className="relative">
+              <UserCircle size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input value={nome} onChange={(e) => setNome(e.target.value)} required type="text" placeholder="Ex: João da Silva"
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
+                  erroNome ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                }`} />
+            </div>
+            {erroNome && <span className="text-xs text-red-500 block mt-1">{erroNome}</span>}
           </div>
-          <input value={cpfPassaporte} onChange={handleDocChange} required type="text" placeholder={tipoDoc === 'CPF' ? "999.999.999-99" : "Letras e Números"}
-            className={`w-full p-2.5 rounded-lg bg-[#FFF8EF] outline-none transition-all ${
-              erroDoc ? 'border border-red-400 focus:border-red-400' : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
-            }`} />
-          {erroDoc && <span className="text-xs text-red-500 block mt-1">{erroDoc}</span>}
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Documento</label>
+              <select value={tipoDoc} onChange={(e) => setTipoDoc(e.target.value as 'CPF' | 'Passaporte')} className="text-xs bg-transparent text-[#EF9B1B] font-bold outline-none cursor-pointer">
+                <option value="CPF">CPF</option>
+                <option value="Passaporte">Passaporte</option>
+              </select>
+            </div>
+            <div className="relative">
+              <FileText size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input value={cpfPassaporte} onChange={handleDocChange} required type="text" placeholder={tipoDoc === 'CPF' ? "999.999.999-99" : "Letras e Números"}
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
+                  erroDoc ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                }`} />
+            </div>
+            {erroDoc && <span className="text-xs text-red-500 block mt-1">{erroDoc}</span>}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Telefone</label>
+            <div className="relative">
+              <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input value={telefone} onChange={handleTelefoneChange} required type="text" placeholder="(99) 99999-9999"
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
+                  erroTel ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                }`} />
+            </div>
+            {erroTel && <span className="text-xs text-red-500 block mt-1">{erroTel}</span>}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Email</label>
+            <div className="relative">
+              <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" placeholder="seu@email.com"
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
+                  erroEmail ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                }`} />
+            </div>
+            {erroEmail && <span className="text-xs text-red-500 block mt-1">{erroEmail}</span>}
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Nascimento</label>
+            <div className="relative">
+              <CalendarDays size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input value={nascimento} onChange={(e) => setNascimento(e.target.value)} required type="date"
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
+                  erroNasc ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                }`} />
+            </div>
+            {erroNasc && <span className="text-xs text-red-500 block mt-1">{erroNasc}</span>}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">País</label>
+            <div className="relative">
+              <Globe size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <select value={paisId} onChange={(e) => setPaisId(e.target.value)} required
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] outline-none transition-all text-gray-800 appearance-none">
+                <option value="">Selecione</option>
+                {paises?.map((pais) => <option key={pais.id} value={pais.id}>{pais.nome}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Estado</label>
+            <div className="relative">
+              <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <select value={estadoId} onChange={(e) => setEstadoId(e.target.value)} required
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 appearance-none ${
+                  erroEstado ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                }`}>
+                <option value="">Selecione</option>
+                {estados?.map((estado) => <option key={estado.id} value={estado.id}>{estado.nomeEstado} - {estado.siglaUf}</option>)}
+              </select>
+            </div>
+            {erroEstado && <span className="text-xs text-red-500 block mt-1">{erroEstado}</span>}
+          </div>
+
         </div>
 
-        <div className="space-y-1">
-          <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">Telefone</label>
-          <input value={telefone} onChange={handleTelefoneChange} required type="text" placeholder="(99) 99999-9999"
-            className={`w-full p-2.5 rounded-lg bg-[#FFF8EF] outline-none transition-all ${
-              erroTel ? 'border border-red-400 focus:border-red-400' : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
-            }`} />
-          {erroTel && <span className="text-xs text-red-500 block mt-1">{erroTel}</span>}
-        </div>
+        {error && (
+          <div className="p-4 mt-6 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg font-medium text-sm">
+            {error}
+          </div>
+        )}
 
-        <div className="space-y-1">
-          <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" placeholder="seu@email.com"
-            className={`w-full p-2.5 rounded-lg bg-[#FFF8EF] outline-none transition-all ${
-              erroEmail ? 'border border-red-400 focus:border-red-400' : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
-            }`} />
-          {erroEmail && <span className="text-xs text-red-500 block mt-1">{erroEmail}</span>}
+        <div className="flex justify-end gap-3 pt-6 border-t border-gray-100 mt-6">
+          <button type="button" onClick={onCancel} className="px-8 py-3 rounded-xl font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" className="px-8 py-3 bg-[#222020] text-white rounded-xl font-medium hover:bg-[#EF9B1B] transition-colors">
+            {hospedeEditando ? 'Salvar Alterações' : 'Salvar Hóspede'}
+          </button>
         </div>
-
-        <div className="space-y-1 md:col-span-2">
-          <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">Nascimento</label>
-          <input value={nascimento} onChange={(e) => setNascimento(e.target.value)} required type="date"
-            className={`w-full p-2.5 rounded-lg bg-[#FFF8EF] outline-none transition-all ${
-              erroNasc ? 'border border-red-400 focus:border-red-400' : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
-            }`} />
-          {erroNasc && <span className="text-xs text-red-500 block mt-1">{erroNasc}</span>}
-        </div>
-
-        <div className="space-y-1">
-          <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">País</label>
-          <select value={paisId} onChange={(e) => setPaisId(e.target.value)} required
-            className="w-full p-2.5 rounded-lg border border-[#222020]/20 bg-[#FFF8EF] focus:border-[#EF9B1B] outline-none transition-all">
-            <option value="">Selecione</option>
-            {paises?.map((pais) => <option key={pais.id} value={pais.id}>{pais.nome}</option>)}
-          </select>
-        </div>
-
-        <div className="space-y-1">
-          <label className="text-xs font-medium uppercase tracking-wider text-[#222020]">Estado</label>
-          <select value={estadoId} onChange={(e) => setEstadoId(e.target.value)} required
-            className={`w-full p-2.5 rounded-lg bg-[#FFF8EF] outline-none transition-all ${
-              erroEstado ? 'border border-red-400 focus:border-red-400' : 'border border-[#222020]/20 focus:border-[#EF9B1B]'
-            }`}>
-            <option value="">Selecione</option>
-            {estados?.map((estado) => <option key={estado.id} value={estado.id}>{estado.nomeEstado} - {estado.siglaUf}</option>)}
-          </select>
-          {erroEstado && <span className="text-xs text-red-500 block mt-1">{erroEstado}</span>}
-        </div>
-      </div>
-
-      <div className="mt-8 flex gap-3">
-        <button type="button" onClick={onCancel} className="flex-1 py-2.5 rounded-lg font-medium border border-[#222020]/20 text-[#222020] hover:bg-gray-50 transition-colors">
-          Cancelar
-        </button>
-        <button type="submit" className="flex-1 py-2.5 rounded-lg font-medium bg-[#EF9B1B] text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:scale-95 transition-all">
-          Salvar
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }

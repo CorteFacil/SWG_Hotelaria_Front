@@ -1,4 +1,4 @@
-import { Tags, DollarSign, Users, AlignLeft, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Tags, DollarSign, Users, AlignLeft, AlertCircle, CheckCircle2, BedDouble, Maximize } from 'lucide-react'
 import { useState, useEffect, type SyntheticEvent } from 'react'
 
 interface TipoDeQuartoFormProps {
@@ -74,7 +74,7 @@ export default function TipoDeQuartoForm({ tipoEditando, onSubmit, onCancel }: T
   }
 
   return (
-    <div className="bg-white p-6 md:p-8 rounded-[1.25rem] shadow-[0_8px_30px_rgba(34,32,32,0.04)] border border-gray-100">
+    <div className="bg-white p-6 md:p-8 rounded-[1.25rem] shadow-[0_8px_30px_rgba(34,32,32,0.04)] border border-[#EF9B1B] w-full">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-[#222020] mb-2 flex items-center gap-2">
           <Tags className="text-[#EF9B1B]" /> Cadastro de Tipo de Quarto
@@ -96,7 +96,9 @@ export default function TipoDeQuartoForm({ tipoEditando, onSubmit, onCancel }: T
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
+          
+          {/* Nome - Ocupa a largura total na tela média */}
+          <div className="space-y-2 md:col-span-2">
             <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Nome da Categoria</label>
             <input 
               required type="text" placeholder="Ex: Suíte Master Vista Mar"
@@ -106,7 +108,7 @@ export default function TipoDeQuartoForm({ tipoEditando, onSubmit, onCancel }: T
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Preço Base (R$)</label>
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Preço Diária (R$)</label>
             <div className="relative">
               <DollarSign size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
@@ -118,7 +120,7 @@ export default function TipoDeQuartoForm({ tipoEditando, onSubmit, onCancel }: T
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Capacidade (Pessoas)</label>
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Capacidade Máxima</label>
             <div className="relative">
               <Users size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
@@ -128,6 +130,33 @@ export default function TipoDeQuartoForm({ tipoEditando, onSubmit, onCancel }: T
               />
             </div>
           </div>
+
+          {/* NOVO CAMPO: Tipo de Cama */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Tipo de Cama</label>
+            <div className="relative">
+              <BedDouble size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input 
+                required type="text" placeholder="Ex: 1 Cama King"
+                value={tipoCama} onChange={e => setTipoCama(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] outline-none transition-all text-gray-800"
+              />
+            </div>
+          </div>
+
+          {/* NOVO CAMPO: Tamanho */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Tamanho (m²)</label>
+            <div className="relative">
+              <Maximize size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input 
+                required type="number" min="1" placeholder="Ex: 25"
+                value={tamanho} onChange={e => setTamanho(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] outline-none transition-all text-gray-800"
+              />
+            </div>
+          </div>
+
         </div>
 
         <div className="space-y-2">
@@ -142,12 +171,19 @@ export default function TipoDeQuartoForm({ tipoEditando, onSubmit, onCancel }: T
           </div>
         </div>
 
-        <div className="flex justify-end pt-4 border-t border-gray-100">
+        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+          <button 
+            type="button" 
+            onClick={onCancel}
+            className="px-8 py-3 rounded-xl font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800 transition-colors"
+          >
+            Cancelar
+          </button>
           <button 
             type="submit" disabled={loading}
             className="px-8 py-3 bg-[#222020] text-white rounded-xl font-medium hover:bg-[#EF9B1B] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {loading ? 'Salvando...' : 'Salvar Tipo de Quarto'}
+            {loading ? 'Salvando...' : (tipoEditando ? 'Salvar Alterações' : 'Salvar Tipo de Quarto')}
           </button>
         </div>
       </form>
