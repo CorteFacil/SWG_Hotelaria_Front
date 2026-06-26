@@ -21,6 +21,7 @@ import RelatorioFaturamentoPage from "./pages/RelatorioFaturamentoPage";
 import TipoDeQuartoAdminPage from './pages/TipoDeQuartoAdminPage';
 import HospedeAdminPage from './pages/HospedeAdminPage';
 import ReservaAdminPage from "./pages/ReservaAdminPage";
+import DashboardHome from "./pages/DashboardHome";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +36,7 @@ function Router() {
       <Route path="/estadia" component={EstadiaPage} /> 
       
       <Route path="/admin">
-        <AdminPage><h2>Bem-vindo ao Painel</h2></AdminPage>
+        <AdminPage><DashboardHome /></AdminPage>
       </Route>
       <Route path="/admin/ordem-limpeza">
         <AdminPage><OrdemLimpezaPage /></AdminPage>
