@@ -30,7 +30,7 @@ export default function ReservaForm({ tipos, hospedeId, error, reservaEditando, 
     } else {
       setEntradaAcomodacao('');
       setSaidaAcomodacao('');
-      setNumeroPessoas('1');
+      setNumeroPessoas('');
       setObservacao('');
       setTipoDeQuartoId('');
     }

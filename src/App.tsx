@@ -5,18 +5,22 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
-import HospedePage from './pages/HospedePage';
-import ReservaPage from './pages/ReservaPage';
-import HospedeAdminPage from './pages/HospedeAdminPage';
-import TipoDeQuartoAdminPage from './pages/TipoDeQuartoAdminPage';
 import AdminPage from './pages/AdminPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminFuncionarioPage from './pages/AdminFuncionarioPage';
 import AdminQuartoPage from './pages/AdminQuartoPage';
 import OrdemLimpezaPage from './pages/OrdemLimpezaPage';
-import ReservaAdminPage from "./pages/ReservaAdminPage";
 import EstadoPage from './pages/EstadoPage';
 //import EstadiaPage from './pages/EstadiaPage';
+
+//tracy
+import HospedePage from './pages/HospedePage';
+import ReservaPage from './pages/ReservaPage';
+import RelatorioReservasPage from './pages/RelatorioReservasPage';
+import RelatorioFaturamentoPage from "./pages/RelatorioFaturamentoPage";
+import TipoDeQuartoAdminPage from './pages/TipoDeQuartoAdminPage';
+import HospedeAdminPage from './pages/HospedeAdminPage';
+import ReservaAdminPage from "./pages/ReservaAdminPage";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +53,12 @@ function Router() {
       </Route>
       <Route path="/admin/tipos-de-quarto">
         <AdminPage><TipoDeQuartoAdminPage /></AdminPage>
+      </Route>
+      <Route path="/admin/relatorios/relatorio-reservas">
+        <AdminPage><RelatorioReservasPage /></AdminPage>
+      </Route>
+      <Route path="/admin/relatorios/relatorio-faturamento">
+        <AdminPage><RelatorioFaturamentoPage /></AdminPage>
       </Route>
       <Route path="/admin/estado">
         <AdminPage><EstadoPage /></AdminPage>
