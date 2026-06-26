@@ -95,7 +95,7 @@ export default function HospedeAdminPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto w-full animate-fade-in relative">
+    <div className="max-w-8xl w-full animate-fade-in relative">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-[#222020] font-admin">Gestão de Hóspedes</h1>
         <p className="text-gray-500 mt-1">Cadastro e histórico de clientes do hotel.</p>

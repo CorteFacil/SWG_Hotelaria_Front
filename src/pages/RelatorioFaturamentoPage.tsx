@@ -2,19 +2,11 @@ import { useState } from "react";
 import { api } from "../api";
 import { Loader2, CalendarDays, TrendingUp, DollarSign, AlertCircle, BarChart3 } from "lucide-react";
 
-// Tipagem baseada no retorno exato do seu backend (ReservaService.js)
-interface RelatorioFaturamentoItem {
-  tipoAcomodacao: string;
-  quantidadeReservas: number;
-  precoDiaria: number;
-  totalProjetado: number;
-}
-
 export default function RelatorioFaturamentoPage() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
   
-  const [resultados, setResultados] = useState<RelatorioFaturamentoItem[]>([]);
+  const [resultados, setResultados] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [buscou, setBuscou] = useState(false);
@@ -32,20 +24,38 @@ export default function RelatorioFaturamentoPage() {
       );
       setResultados(dados || []);
     } catch (err) {
-      setErro((err as Error).message);
+      let msg = (err as Error).message;
+      
+      try {
+        while (typeof msg === 'string' && msg.trim().startsWith('{')) {
+          const parsed = JSON.parse(msg);
+          if (parsed.message) {
+            msg = parsed.message;
+          } else if (parsed.error) {
+            msg = parsed.error;
+          } else {
+            break;
+          }
+        }
+      } catch (e) { 
+      }
+      
+      setErro(msg);
       setResultados([]);
     } finally {
       setLoading(false);
     }
   }
 
-  // Formatador de Moeda nativo do JavaScript (Perfeito para R$)
   const formatarDinheiro = (valor: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   };
 
-  // Calcula o somatório final de todo o faturamento da tabela
-  const totalGeral = resultados.reduce((acc, curr) => acc + curr.totalProjetado, 0);
+  // Soma o total considerando os nomes vindos do Postgres em minúsculas
+  const totalGeral = resultados.reduce((acc, curr) => {
+    const valor = curr.totalProjetado || curr.totalprojetado || 0;
+    return acc + valor;
+  }, 0);
 
   return (
     <div className="max-w-7xl mx-auto w-full animate-fade-in relative">
@@ -54,7 +64,6 @@ export default function RelatorioFaturamentoPage() {
         <p className="text-gray-500 mt-1">Análise de receita projetada baseada em reservas confirmadas por categoria.</p>
       </div>
 
-      {/* CARD DE FILTROS */}
       <div className="bg-white p-6 rounded-[1.25rem] shadow-[0_8px_30px_rgba(34,32,32,0.04)] border border-[#EF9B1B] mb-8">
         <h3 className="text-lg font-bold text-[#222020] font-admin mb-4 flex items-center gap-2">
           <TrendingUp className="text-[#EF9B1B]" size={20} /> Filtros de Período
@@ -86,11 +95,9 @@ export default function RelatorioFaturamentoPage() {
         </form>
       </div>
 
-      {/* RESULTADOS */}
       {buscou && (
         <div className="space-y-6">
-          {/* Card Resumo Total - Fica muito profissional num painel admin */}
-          {!loading && resultados.length > 0 && (
+          {!loading && !erro && resultados.length > 0 && (
             <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-[1.25rem] flex items-center justify-between shadow-sm animate-fade-in">
               <div>
                 <p className="text-emerald-700 font-bold uppercase tracking-widest text-xs mb-1">Total Projetado no Período</p>
@@ -133,20 +140,27 @@ export default function RelatorioFaturamentoPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {resultados.map((item, index) => (
-                      <tr key={index} className="hover:bg-gray-50 transition-colors">
-                        <td className="p-4 text-sm font-bold text-[#222020]">{item.tipoAcomodacao}</td>
-                        <td className="p-4 text-sm text-gray-600 text-center font-medium">
-                          <span className="bg-gray-100 px-3 py-1 rounded-full">{item.quantidadeReservas}</span>
-                        </td>
-                        <td className="p-4 text-sm text-gray-500 text-right">
-                          {formatarDinheiro(item.precoDiaria)}
-                        </td>
-                        <td className="p-4 text-sm font-bold text-emerald-600 text-right">
-                          {formatarDinheiro(item.totalProjetado)}
-                        </td>
-                      </tr>
-                    ))}
+                    {resultados.map((item, index) => {
+                      const tipoAcomodacao = item.tipoAcomodacao || item.tipoacomodacao;
+                      const quantidadeReservas = item.quantidadeReservas || item.quantidadereservas;
+                      const precoDiaria = item.precoDiaria || item.precodiaria;
+                      const totalProjetado = item.totalProjetado || item.totalprojetado;
+
+                      return (
+                        <tr key={index} className="hover:bg-gray-50 transition-colors">
+                          <td className="p-4 text-sm font-bold text-[#222020]">{tipoAcomodacao}</td>
+                          <td className="p-4 text-sm text-gray-600 text-center font-medium">
+                            <span className="bg-gray-100 px-3 py-1 rounded-full">{quantidadeReservas}</span>
+                          </td>
+                          <td className="p-4 text-sm text-gray-500 text-right">
+                            {formatarDinheiro(precoDiaria)}
+                          </td>
+                          <td className="p-4 text-sm font-bold text-emerald-600 text-right">
+                            {formatarDinheiro(totalProjetado)}
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>

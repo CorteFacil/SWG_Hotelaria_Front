@@ -115,14 +115,27 @@ export const api = {
   getReservasPorTipoQuarto: (tipoDeQuartoId: number): Promise<Reserva[]> => request(`/reserva/tipo/${tipoDeQuartoId}`),
   confirmarReservasAutomaticas: (): Promise<any> => request('/reserva/confirmar-automaticas', { method: 'POST' }),
   getRelatorioReservasPeriodo: (dataInicio?: string, dataFim?: string, hospedeId?: number, tipoDeQuartoId?: number): Promise<any> => {
-    let url = `/reserva/relatorio/periodo`;
-    if (dataInicio && dataFim) url += `/${dataInicio}/${dataFim}`;
-    if (hospedeId && tipoDeQuartoId) url += `/${hospedeId}/${tipoDeQuartoId}`;
+    // Constrói os Query Params de forma inteligente (só adiciona se existir)
+    const params = new URLSearchParams();
+    if (dataInicio) params.append('dataInicio', dataInicio);
+    if (dataFim) params.append('dataFim', dataFim);
+    if (hospedeId) params.append('hospedeId', String(hospedeId));
+    if (tipoDeQuartoId) params.append('tipoDeQuartoId', String(tipoDeQuartoId));
+    
+    const queryString = params.toString();
+    const url = queryString ? `/reserva/relatorio/periodo?${queryString}` : '/reserva/relatorio/periodo';
+    
     return request(url);
   },
+
   getRelatorioFaturamento: (dataInicio?: string, dataFim?: string): Promise<any> => {
-    let url = `/reserva/relatorio/faturamento`;
-    if (dataInicio && dataFim) url += `/${dataInicio}/${dataFim}`;
+    const params = new URLSearchParams();
+    if (dataInicio) params.append('dataInicio', dataInicio);
+    if (dataFim) params.append('dataFim', dataFim);
+    
+    const queryString = params.toString();
+    const url = queryString ? `/reserva/relatorio/faturamento?${queryString}` : '/reserva/relatorio/faturamento';
+    
     return request(url);
   },
 
