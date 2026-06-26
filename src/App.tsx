@@ -11,7 +11,7 @@ import AdminFuncionarioPage from './pages/AdminFuncionarioPage';
 import AdminQuartoPage from './pages/AdminQuartoPage';
 import OrdemLimpezaPage from './pages/OrdemLimpezaPage';
 import EstadoPage from './pages/EstadoPage';
-//import EstadiaPage from './pages/EstadiaPage';
+import EstadiaPage from './pages/EstadiaPage';
 
 //tracy
 import HospedePage from './pages/HospedePage';
@@ -32,6 +32,7 @@ function Router() {
       <Route path="/reserva" component={ReservaPage} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/estado" component={EstadoPage} />
+      <Route path="/estadia" component={EstadiaPage} /> 
       
       <Route path="/admin">
         <AdminPage><h2>Bem-vindo ao Painel</h2></AdminPage>
@@ -63,9 +64,9 @@ function Router() {
       <Route path="/admin/estado">
         <AdminPage><EstadoPage /></AdminPage>
       </Route>
-      {/* <Route path="/admin/Estadia">
+      <Route path="/admin/Estadia">
         <AdminPage><EstadiaPage /></AdminPage>
-      </Route> */}
+      </Route>
 
       <Route component={NotFound} />
     </Switch>
