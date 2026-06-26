@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import HospedePage from './pages/HospedePage';
 import ReservaPage from './pages/ReservaPage';
+import HospedeAdminPage from './pages/HospedeAdminPage';
 import TipoDeQuartoAdminPage from './pages/TipoDeQuartoAdminPage';
 import AdminPage from './pages/AdminPage';
 import AdminLogin from './pages/AdminLogin';
@@ -44,7 +45,7 @@ function Router() {
         <AdminPage><ReservaAdminPage /></AdminPage>
       </Route>
       <Route path="/admin/hospedes">
-        <AdminPage><HospedePage /></AdminPage>
+        <AdminPage><HospedeAdminPage /></AdminPage>
       </Route>
       <Route path="/admin/tipos-de-quarto">
         <AdminPage><TipoDeQuartoAdminPage /></AdminPage>
