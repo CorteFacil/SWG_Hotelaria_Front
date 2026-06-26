@@ -51,9 +51,8 @@ export default function RelatorioFaturamentoPage() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   };
 
-  // Soma o total considerando os nomes vindos do Postgres em minúsculas
   const totalGeral = resultados.reduce((acc, curr) => {
-    const valor = curr.totalProjetado || curr.totalprojetado || 0;
+    const valor = Number(curr.totalProjetado || curr.totalprojetado || 0);
     return acc + valor;
   }, 0);
 
@@ -143,8 +142,10 @@ export default function RelatorioFaturamentoPage() {
                     {resultados.map((item, index) => {
                       const tipoAcomodacao = item.tipoAcomodacao || item.tipoacomodacao;
                       const quantidadeReservas = item.quantidadeReservas || item.quantidadereservas;
-                      const precoDiaria = item.precoDiaria || item.precodiaria;
-                      const totalProjetado = item.totalProjetado || item.totalprojetado;
+                      
+                      // FORÇAR A CONVERSÃO PARA NÚMERO AQUI:
+                      const precoDiaria = Number(item.precoDiaria || item.precodiaria || 0);
+                      const totalProjetado = Number(item.totalProjetado || item.totalprojetado || 0);
 
                       return (
                         <tr key={index} className="hover:bg-gray-50 transition-colors">
