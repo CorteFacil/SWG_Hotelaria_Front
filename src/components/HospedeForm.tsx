@@ -1,5 +1,5 @@
 import { useState, type FormEvent, useEffect } from 'react';
-import { UserCircle, FileText, Phone, Mail, CalendarDays, Globe, MapPin } from 'lucide-react';
+import { UserCircle, FileText, Phone, Mail, CalendarDays, Globe, MapPin, AlertCircle } from 'lucide-react';
 import type { Estado, PaisIso } from '../types';
 
 interface HospedeFormProp {
@@ -8,7 +8,7 @@ interface HospedeFormProp {
   initialDoc?: string 
   error?: string 
   hospedeEditando?: any
-  onSubmit: (data: any) => void
+  onSubmit: (data: any) => Promise<void> | void
   onCancel: () => void
 }
 
@@ -21,6 +21,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
   const [nascimento, setNascimento] = useState('');
   const [estadoId, setEstadoId] = useState('');
   const [paisId, setPaisId] = useState(''); 
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (hospedeEditando) {
@@ -52,9 +53,16 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
     }
   }, [hospedeEditando, initialDoc, estados]); 
 
+  // Nova máquina de fatiar erros: Usa um truque seguro para não quebrar nos pontos do CPF
+  const extrairSentencas = (texto: string) => {
+    if (!texto) return [];
+    // Troca ". " por ".|" e depois corta no "|", preservando "NNN.NNN"
+    return texto.replace(/([.!?])\s+/g, "$1|").split("|").filter(Boolean);
+  };
+
   const getErro = (palavrasChave: string[]) => {
     if (!error) return null;
-    const sentencas = error.match(/[^.!?]+[.!?]+/g) || [error];
+    const sentencas = extrairSentencas(error);
     const encontradas = sentencas.filter(s => 
       palavrasChave.some(p => s.toLowerCase().includes(p.toLowerCase()))
     );
@@ -62,11 +70,15 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
   };
 
   const erroNome = getErro(['Nome']);
-  const erroDoc = getErro(['Documento', 'CPF', 'Passaporte']);
+  const erroDoc = getErro(['Documento', 'CPF', 'Passaporte', 'cpfPassaporte']);
   const erroTel = getErro(['Telefone']);
   const erroEmail = getErro(['Email']);
-  const erroNasc = getErro(['Nascimento']);
-  const erroEstado = getErro(['Estado']);
+  const erroNasc = getErro(['Nascimento', 'data']);
+  const erroEstado = getErro(['Estado', 'estadoId']);
+
+  const sentencas = extrairSentencas(error || "");
+  const errosUsados = [erroNome, erroDoc, erroTel, erroEmail, erroNasc, erroEstado].filter(Boolean).join(' ');
+  const erroGeral = sentencas.filter(s => !errosUsados.includes(s.trim())).join(' ').trim();
 
   const handleDocChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
@@ -91,13 +103,31 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
     setTelefone(v);
   };
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit({
-      nome, cpfPassaporte, email, telefone, nascimento,
-      estadoId: Number(estadoId),
-      paisId: Number(paisId)
-    });
+    setLoading(true);
+    
+    try {
+      await onSubmit({
+        nome, cpfPassaporte, email, telefone, nascimento,
+        estadoId: Number(estadoId),
+        paisId: Number(paisId)
+      });
+      
+      if (!hospedeEditando) {
+        setNome('');
+        setCpfPassaporte(initialDoc);
+        setEmail('');
+        setTelefone('');
+        setNascimento('');
+        setEstadoId('');
+        setPaisId('');
+      }
+    } catch (err) {
+      // O erro é tratado pelo pai
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -121,7 +151,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
                   erroNome ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
                 }`} />
             </div>
-            {erroNome && <span className="text-xs text-red-500 block mt-1">{erroNome}</span>}
+            {erroNome && <span className="text-xs text-red-500 font-medium block mt-1">{erroNome}</span>}
           </div>
 
           <div className="space-y-2">
@@ -139,7 +169,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
                   erroDoc ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
                 }`} />
             </div>
-            {erroDoc && <span className="text-xs text-red-500 block mt-1">{erroDoc}</span>}
+            {erroDoc && <span className="text-xs text-red-500 font-medium block mt-1">{erroDoc}</span>}
           </div>
 
           <div className="space-y-2">
@@ -151,7 +181,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
                   erroTel ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
                 }`} />
             </div>
-            {erroTel && <span className="text-xs text-red-500 block mt-1">{erroTel}</span>}
+            {erroTel && <span className="text-xs text-red-500 font-medium block mt-1">{erroTel}</span>}
           </div>
 
           <div className="space-y-2">
@@ -163,7 +193,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
                   erroEmail ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
                 }`} />
             </div>
-            {erroEmail && <span className="text-xs text-red-500 block mt-1">{erroEmail}</span>}
+            {erroEmail && <span className="text-xs text-red-500 font-medium block mt-1">{erroEmail}</span>}
           </div>
 
           <div className="space-y-2 md:col-span-2">
@@ -175,7 +205,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
                   erroNasc ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
                 }`} />
             </div>
-            {erroNasc && <span className="text-xs text-red-500 block mt-1">{erroNasc}</span>}
+            {erroNasc && <span className="text-xs text-red-500 font-medium block mt-1">{erroNasc}</span>}
           </div>
 
           <div className="space-y-2">
@@ -202,14 +232,15 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
                 {estados?.map((estado) => <option key={estado.id} value={estado.id}>{estado.nomeEstado} - {estado.siglaUf}</option>)}
               </select>
             </div>
-            {erroEstado && <span className="text-xs text-red-500 block mt-1">{erroEstado}</span>}
+            {erroEstado && <span className="text-xs text-red-500 font-medium block mt-1">{erroEstado}</span>}
           </div>
 
         </div>
 
-        {error && (
-          <div className="p-4 mt-6 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg font-medium text-sm">
-            {error}
+        {erroGeral && (
+          <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg font-medium text-sm flex items-center gap-3">
+            <AlertCircle size={20} className="shrink-0" />
+            <p>{erroGeral}</p>
           </div>
         )}
 
@@ -217,8 +248,8 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
           <button type="button" onClick={onCancel} className="px-8 py-3 rounded-xl font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800 transition-colors">
             Cancelar
           </button>
-          <button type="submit" className="px-8 py-3 bg-[#222020] text-white rounded-xl font-medium hover:bg-[#EF9B1B] transition-colors">
-            {hospedeEditando ? 'Salvar Alterações' : 'Salvar Hóspede'}
+          <button type="submit" disabled={loading} className="px-8 py-3 bg-[#222020] text-white rounded-xl font-medium hover:bg-[#EF9B1B] transition-colors disabled:opacity-70 flex items-center gap-2">
+            {loading ? 'Salvando...' : (hospedeEditando ? 'Salvar Alterações' : 'Salvar Hóspede')}
           </button>
         </div>
       </form>

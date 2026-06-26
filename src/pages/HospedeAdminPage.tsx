@@ -15,6 +15,9 @@ export default function HospedeAdminPage() {
   const [loadingDados, setLoadingDados] = useState(true);
   const [erroPagina, setErroPagina] = useState("");
   const [sucessoFeedback, setSucessoFeedback] = useState("");
+  
+  // NOVO: Estado para gerenciar os erros do formulário sem usar alert()
+  const [erroForm, setErroForm] = useState("");
 
   const [itemParaExcluir, setItemParaExcluir] = useState<{id: number, nome: string} | null>(null);
   const [textoConfirmacao, setTextoConfirmacao] = useState("");
@@ -43,27 +46,52 @@ export default function HospedeAdminPage() {
   }
 
   async function handleSubmitForm(data: any) {
+    setErroForm(""); // Limpa os erros antigos ao tentar salvar novamente
+    
     try {
+      // TRUQUE DE PAYLOAD: Garante que o ID vá como número e como objeto aninhado
+      // para satisfazer qualquer exigência restrita do backend
+      const payloadSeguro = {
+        ...data,
+        estadoId: Number(data.estadoId),
+        paisId: Number(data.paisId),
+        estado: { id: Number(data.estadoId) }
+      };
+
       if (hospedeEditando) {
-        await api.updateHospede(hospedeEditando.id, data);
-        mostrarSucesso("Hóspede atualizado com sucesso! ✨");
+        await api.updateHospede(hospedeEditando.id, payloadSeguro);
+        mostrarSucesso("Hóspede atualizado com sucesso!");
       } else {
-        await api.createHospede(data);
-        mostrarSucesso("Hóspede cadastrado com sucesso! ✨");
+        await api.createHospede(payloadSeguro);
+        mostrarSucesso("Hóspede cadastrado com sucesso!");
       }
       handleCancel(); 
       carregarDados(); 
     } catch (err) {
-      alert(`Erro ao salvar: ${(err as Error).message}`);
+      let msg = (err as Error).message;
+      try {
+        while (typeof msg === 'string' && msg.trim().startsWith('{')) {
+          const parsed = JSON.parse(msg);
+          if (parsed.message) msg = parsed.message;
+          else if (parsed.error) msg = parsed.error;
+          else break;
+        }
+      } catch (e) { }
+      
+      setErroForm(msg); 
+      
+      throw new Error(msg); 
     }
   }
 
   function handleCancel() {
     setHospedeEditando(null);
+    setErroForm(""); // Limpa qualquer erro que tenha ficado se o usuário cancelar
   }
 
   function handleCliqueEditar(hospede: Hospede) {
     setHospedeEditando(hospede);
+    setErroForm("");
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -77,7 +105,18 @@ export default function HospedeAdminPage() {
       if (hospedeEditando?.id === itemParaExcluir.id) handleCancel();
       mostrarSucesso("Registro excluído permanentemente.");
     } catch (err) {
-      alert("Erro ao excluir. O hóspede pode ter reservas ativas.");
+      // Para a exclusão, podemos usar um feedback na tela também
+      let msg = (err as Error).message;
+      try {
+        while (typeof msg === 'string' && msg.trim().startsWith('{')) {
+          const parsed = JSON.parse(msg);
+          if (parsed.message) msg = parsed.message;
+          else if (parsed.error) msg = parsed.error;
+          else break;
+        }
+      } catch (e) { }
+      
+      alert(`Erro ao excluir: ${msg}`); // Mantive um alert simples aqui apenas por ser um modal sobreposto, mas você pode criar um estado de erro também se preferir.
     } finally {
       setDeletando(false);
     }
@@ -95,8 +134,8 @@ export default function HospedeAdminPage() {
   });
 
   return (
-    <div className="max-w-8xl w-full animate-fade-in relative">
-      <div className="mb-6">
+    <div className="max-w-7xl mx-auto w-full h-screen flex flex-col p-4 animate-fade-in relative">
+      <div className="mb-4">
         <h1 className="text-3xl font-bold text-[#222020] font-admin">Gestão de Hóspedes</h1>
         <p className="text-gray-500 mt-1">Cadastro e histórico de clientes do hotel.</p>
       </div>
@@ -111,20 +150,21 @@ export default function HospedeAdminPage() {
           <p>{erroPagina}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start flex-1 overflow-hidden">
           
-          <div className="space-y-6">
+          <div className="space-y-6 h-full overflow-y-auto custom-scroll pr-2">
             <HospedeForm 
               estados={estados}
               paises={paises}
               hospedeEditando={hospedeEditando} 
+              error={erroForm} // <-- AGORA O ERRO VAI PARA O COMPONENTE
               onSubmit={handleSubmitForm}
               onCancel={handleCancel}
             />
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col overflow-hidden sticky top-6 max-h-[75vh]">
-            <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col h-full overflow-hidden">
+            <div className="p-6 border-b border-gray-100 bg-gray-50/50 shrink-0">
               <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Hóspedes Registrados</h3>
               <div className="relative">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />

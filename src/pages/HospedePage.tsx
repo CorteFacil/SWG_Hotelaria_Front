@@ -1,75 +1,119 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'wouter'
 import { api } from '../api'
-import type { PaisIso, Estado, Hospede } from '../types'
+import type { PaisIso, Estado } from '../types'
 import HospedeForm from '../components/HospedeForm'
-import styles from './Page.module.css'
+import { UserPlus, CheckCircle2, Loader2 } from 'lucide-react'
 
 export default function HospedePage() {
+  const [, setLocation] = useLocation() // HOOK DE NAVEGAÇÃO
   const [estados, setEstados] = useState<Estado[]>([])
-  const [paises, setPais] = useState<PaisIso[]>([])
-  const [hospedes, setHospedes] = useState<Hospede[]>([])
+  const [paises, setPaises] = useState<PaisIso[]>([])
+  
   const [feedback, setFeedback] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadHospedes()
+    loadFormData()
   }, [])
 
-  async function loadHospedes() {
+  async function loadFormData() {
     try {
-      const [loadedEstados, loadedPaises, loadedHospedes] = await Promise.all([
+      const [loadedEstados, loadedPaises] = await Promise.all([
         api.getEstados(),
         api.getPaises(),
-        api.getHospedes(),
       ])
       setEstados(loadedEstados)
-      setHospedes(loadedHospedes)
-      setPais(loadedPaises)
+      setPaises(loadedPaises)
     } catch (err) {
-      setError(`Erro ao carregar hóspedes: ${(err as Error).message}`)
+      setError(`Erro ao carregar formulário: ${(err as Error).message}`)
+    } finally {
+      setLoading(false)
     }
   }
 
-  async function handleCreateHospede(data: Omit<Hospede, 'id'>) {
+  function mostrarSucesso(mensagem: string) {
+    setFeedback(mensagem);
+    // Reduzido para 2.5 segundos porque vamos mudar de tela logo em seguida
+    setTimeout(() => setFeedback(''), 2500);
+  }
+
+  async function handleCreateHospede(data: any) {
+    setError('')
     try {
-      const created = await api.createHospede(data)
-      setHospedes((prev) => [...prev, created])
-      setFeedback('Hóspede cadastrado com sucesso.')
-      setError('')
+      const payloadSeguro = {
+        ...data,
+        estadoId: Number(data.estadoId),
+        paisId: Number(data.paisId),
+        estado: { id: Number(data.estadoId) }
+      };
+
+      await api.createHospede(payloadSeguro)
+      
+      mostrarSucesso('Cadastro realizado com sucesso!  Redirecionando...')
+ 
+      setTimeout(() => {
+        setLocation('/reserva');
+      }, 2500);
+
     } catch (err) {
-      setError(`Erro ao salvar hóspede: ${(err as Error).message}`)
-      setFeedback('')
+      let msg = (err as Error).message;
+      try {
+        const parsed = JSON.parse(msg);
+        if (parsed.message) msg = parsed.message;
+      } catch (e) {}
+      
+      setError(msg);
+      throw new Error(msg);
     }
   }
 
   return (
-    <body className="d-flex flex-column min-vh-100 bg-dark-subtle">
-      <h1>Hóspedes</h1>
-      <p>Cadastre novos hóspedes e veja os registros recentes do backend.</p>
-
-      {feedback && <div className={styles.feedback}>{feedback}</div>}
-      {error && <div className={styles.error}>{error}</div>}
-
-      <div className={styles.pageGrid}>
-        <HospedeForm estados={estados} paises={paises} onSubmit={handleCreateHospede} onCancel={function (): void {
-          throw new Error('Function not implemented.')
-        } } />
+    <div className="min-h-screen bg-[#FFF8EF] font-admin text-[#222020] flex flex-col items-center py-4 px-4 sm:px-6 relative selection:bg-[#EF9B1B]/30">
+      
+      <div className="w-full max-w-3xl animate-fade-in">
         
-        <section className='bg-light p-4'>
-          <h2>Últimos hóspedes</h2>
-          <ul>
-            {hospedes.length === 0 ? (
-              <li>Nenhum hóspede encontrado.</li>
-            ) : (
-              hospedes.slice(-10).map((hospede) => (
-                <li key={hospede.id}>
-                  {hospede.nome} • {hospede.email}
-                </li>
-              ))
-            )}
-          </ul>
-        </section>
+        <div className="text-center mb-10">
+          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-[#EF9B1B]/20 text-[#EF9B1B]">
+            <UserPlus size={36} />
+          </div>
+          <h1 className="text-4xl font-black text-[#222020] mb-3">
+            Crie sua Conta
+          </h1>
+          <p className="text-gray-500 text-lg max-w-lg mx-auto leading-relaxed">
+            Preencha seus dados abaixo para se tornar nosso hóspede e ter acesso à plataforma de reservas.
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[2rem] border border-[#EF9B1B]/20 shadow-sm">
+            <Loader2 className="w-10 h-10 text-[#EF9B1B] animate-spin mb-4" />
+            <p className="text-gray-500 font-medium text-lg">Preparando formulário...</p>
+          </div>
+        ) : (
+          <div className="space-y-6 animate-fade-in">
+            <HospedeForm 
+              estados={estados} 
+              paises={paises} 
+              error={error} 
+              onSubmit={handleCreateHospede} 
+              onCancel={() => {
+                setError('');
+                window.history.back();
+              }} 
+            />
+          </div>
+        )}
+
       </div>
-    </body>
+
+      {feedback && (
+        <div className="fixed top-8 right-8 z-50 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-xl shadow-xl animate-fade-in max-w-md">
+          <CheckCircle2 size={28} className="text-emerald-500 shrink-0" />
+          <p className="font-bold text-base leading-snug">{feedback}</p>
+        </div>
+      )}
+    </div>
   )
 }

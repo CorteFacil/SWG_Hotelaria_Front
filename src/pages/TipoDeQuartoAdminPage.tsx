@@ -13,10 +13,12 @@ export default function TipoDeQuartoAdminPage() {
   const [loadingDados, setLoadingDados] = useState(true);
   const [erroPagina, setErroPagina] = useState("");
   const [sucessoFeedback, setSucessoFeedback] = useState("");
+  const [erroForm, setErroForm] = useState("");
 
   const [itemParaExcluir, setItemParaExcluir] = useState<{id: number, nome: string} | null>(null);
   const [textoConfirmacao, setTextoConfirmacao] = useState("");
   const [deletando, setDeletando] = useState(false);
+  const [erroExclusao, setErroExclusao] = useState(""); // Novo estado para erro do modal
 
   useEffect(() => { carregarDados(); }, []);
 
@@ -37,33 +39,50 @@ export default function TipoDeQuartoAdminPage() {
   }
 
   async function handleSubmitForm(data: Omit<TipoDeQuarto, "id">) {
+    setErroForm(""); 
+
     try {
       if (tipoEditando) {
         await api.updateTipoDeQuarto(tipoEditando.id, data);
-        mostrarSucesso("Tipo de Quarto atualizado com sucesso! ✨");
+        mostrarSucesso("Tipo de Quarto atualizado com sucesso!");
       } else {
         await api.createTipoDeQuarto(data);
-        mostrarSucesso("Tipo de Quarto criado com sucesso! ✨");
+        mostrarSucesso("Tipo de Quarto criado com sucesso!");
       }
       handleCancel(); 
       carregarDados(); 
     } catch (err) {
-      alert(`Erro ao salvar: ${(err as Error).message}`);
+      let msg = (err as Error).message;
+      try {
+        while (typeof msg === 'string' && msg.trim().startsWith('{')) {
+          const parsed = JSON.parse(msg);
+          if (parsed.message) msg = parsed.message;
+          else if (parsed.error) msg = parsed.error;
+          else break;
+        }
+      } catch (e) { }
+      
+      setErroForm(msg); 
+      // ISSO AQUI FAZ A MÁGICA DE NÃO APAGAR OS DADOS DO FORMULÁRIO:
+      throw new Error(msg); 
     }
   }
 
   function handleCancel() {
     setTipoEditando(null);
+    setErroForm("");
   }
 
   function handleCliqueEditar(tipo: TipoDeQuarto) {
     setTipoEditando(tipo);
+    setErroForm("");
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function handleConfirmDelete() {
     if (!itemParaExcluir) return;
     setDeletando(true);
+    setErroExclusao("");
     try {
       await api.deleteTipoDeQuarto(itemParaExcluir.id);
       setTipos(tipos.filter(t => t.id !== itemParaExcluir.id));
@@ -71,7 +90,17 @@ export default function TipoDeQuartoAdminPage() {
       if (tipoEditando?.id === itemParaExcluir.id) handleCancel();
       mostrarSucesso("Categoria excluída permanentemente.");
     } catch (err) {
-      alert("Erro ao tentar excluir. Pode haver quartos vinculados a esta categoria.");
+      let msg = (err as Error).message;
+      try {
+        while (typeof msg === 'string' && msg.trim().startsWith('{')) {
+          const parsed = JSON.parse(msg);
+          if (parsed.message) msg = parsed.message;
+          else if (parsed.error) msg = parsed.error;
+          else break;
+        }
+      } catch (e) { }
+      
+      setErroExclusao(msg); // Exibe o erro DENTRO do modal, sem alerts!
     } finally {
       setDeletando(false);
     }
@@ -80,6 +109,7 @@ export default function TipoDeQuartoAdminPage() {
   function fecharModalExclusao() {
     setItemParaExcluir(null);
     setTextoConfirmacao("");
+    setErroExclusao("");
   }
 
   const tiposFiltrados = tipos.filter(t => 
@@ -87,8 +117,8 @@ export default function TipoDeQuartoAdminPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto w-full animate-fade-in relative">
-      <div className="mb-6">
+    <div className="max-w-7xl mx-auto w-full h-screen flex flex-col p-4 animate-fade-in relative">
+      <div className="mb-4">
         <h1 className="text-3xl font-bold text-[#222020] font-admin">Tipos de Quarto</h1>
         <p className="text-gray-500 mt-1">Gerencie as categorias de acomodação do hotel.</p>
       </div>
@@ -103,18 +133,19 @@ export default function TipoDeQuartoAdminPage() {
           <p>{erroPagina}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start flex-1 overflow-hidden">
           
-          <div className="space-y-6">
+          <div className="space-y-6 h-full overflow-y-auto custom-scroll pr-2">
             <TipoDeQuartoForm 
               tipoEditando={tipoEditando} 
+              error={erroForm} 
               onSubmit={handleSubmitForm}
               onCancel={handleCancel}
             />
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col overflow-hidden sticky top-6 max-h-[75vh]">
-            <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col h-full overflow-hidden">
+            <div className="p-6 border-b border-gray-100 bg-gray-50/50 shrink-0">
               <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Categorias Registradas</h3>
               <div className="relative">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -173,9 +204,18 @@ export default function TipoDeQuartoAdminPage() {
               <AlertTriangle size={28} />
               <h3 className="text-xl font-bold text-[#222020] font-admin">Excluir Categoria</h3>
             </div>
+            
             <p className="text-gray-600 mb-4">
               Tem certeza que deseja excluir <strong>{itemParaExcluir.nome}</strong>?
             </p>
+
+            {/* SE DER ERRO NA EXCLUSÃO, APARECE AQUI DENTRO, EM VERMELHO */}
+            {erroExclusao && (
+               <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm font-bold border border-red-200">
+                 {erroExclusao}
+               </div>
+            )}
+
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Digite <span className="text-red-500 font-bold select-all">CANCELAR</span>:</label>
               <input type="text" value={textoConfirmacao} onChange={(e) => setTextoConfirmacao(e.target.value)} placeholder="CANCELAR" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 outline-none text-center font-bold tracking-widest uppercase" />
@@ -189,7 +229,6 @@ export default function TipoDeQuartoAdminPage() {
           </div>
         </div>
       )}
-
 
       {sucessoFeedback && (
         <div className="fixed top-8 right-8 z-50 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-xl shadow-[0_8px_30px_rgba(16,185,129,0.15)] animate-fade-in">
