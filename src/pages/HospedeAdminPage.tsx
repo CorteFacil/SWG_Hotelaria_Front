@@ -15,8 +15,8 @@ export default function HospedeAdminPage() {
   const [loadingDados, setLoadingDados] = useState(true);
   const [erroPagina, setErroPagina] = useState("");
   const [sucessoFeedback, setSucessoFeedback] = useState("");
+  const [erroFeedback, setErroFeedback] = useState("");
   
-  // NOVO: Estado para gerenciar os erros do formulário sem usar alert()
   const [erroForm, setErroForm] = useState("");
 
   const [itemParaExcluir, setItemParaExcluir] = useState<{id: number, nome: string} | null>(null);
@@ -45,12 +45,15 @@ export default function HospedeAdminPage() {
     setTimeout(() => setSucessoFeedback(""), 3000);
   }
 
+  function mostrarErro(mensagem: string) {
+    setErroFeedback(mensagem);
+    setTimeout(() => setErroFeedback(""), 4500);
+  }
+
   async function handleSubmitForm(data: any) {
-    setErroForm(""); // Limpa os erros antigos ao tentar salvar novamente
+    setErroForm("");
     
     try {
-      // TRUQUE DE PAYLOAD: Garante que o ID vá como número e como objeto aninhado
-      // para satisfazer qualquer exigência restrita do backend
       const payloadSeguro = {
         ...data,
         estadoId: Number(data.estadoId),
@@ -79,14 +82,13 @@ export default function HospedeAdminPage() {
       } catch (e) { }
       
       setErroForm(msg); 
-      
       throw new Error(msg); 
     }
   }
 
   function handleCancel() {
     setHospedeEditando(null);
-    setErroForm(""); // Limpa qualquer erro que tenha ficado se o usuário cancelar
+    setErroForm("");
   }
 
   function handleCliqueEditar(hospede: Hospede) {
@@ -105,7 +107,6 @@ export default function HospedeAdminPage() {
       if (hospedeEditando?.id === itemParaExcluir.id) handleCancel();
       mostrarSucesso("Registro excluído permanentemente.");
     } catch (err) {
-      // Para a exclusão, podemos usar um feedback na tela também
       let msg = (err as Error).message;
       try {
         while (typeof msg === 'string' && msg.trim().startsWith('{')) {
@@ -116,7 +117,8 @@ export default function HospedeAdminPage() {
         }
       } catch (e) { }
       
-      alert(`Erro ao excluir: ${msg}`); // Mantive um alert simples aqui apenas por ser um modal sobreposto, mas você pode criar um estado de erro também se preferir.
+      fecharModalExclusao();
+      mostrarErro(msg);
     } finally {
       setDeletando(false);
     }
@@ -157,7 +159,7 @@ export default function HospedeAdminPage() {
               estados={estados}
               paises={paises}
               hospedeEditando={hospedeEditando} 
-              error={erroForm} // <-- AGORA O ERRO VAI PARA O COMPONENTE
+              error={erroForm}
               onSubmit={handleSubmitForm}
               onCancel={handleCancel}
             />
@@ -221,7 +223,6 @@ export default function HospedeAdminPage() {
         </div>
       )}
 
-      {/* MODAL EXCLUSÃO */}
       {itemParaExcluir && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-red-100 animate-fade-in">
@@ -231,12 +232,12 @@ export default function HospedeAdminPage() {
             </div>
             <p className="text-gray-600 mb-4">Tem certeza que deseja excluir <strong>{itemParaExcluir.nome}</strong>?</p>
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Digite <span className="text-red-500 font-bold select-all">CANCELAR</span>:</label>
-              <input type="text" value={textoConfirmacao} onChange={(e) => setTextoConfirmacao(e.target.value)} placeholder="CANCELAR" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 outline-none text-center font-bold tracking-widest uppercase" />
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Digite <span className="text-red-500 font-bold select-all">EXCLUIR</span>:</label>
+              <input type="text" value={textoConfirmacao} onChange={(e) => setTextoConfirmacao(e.target.value.toUpperCase())} placeholder="EXCLUIR" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 outline-none text-center font-bold tracking-widest uppercase" />
             </div>
             <div className="flex gap-3">
               <button onClick={fecharModalExclusao} className="flex-1 py-3 rounded-xl font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
-              <button onClick={handleConfirmDelete} disabled={textoConfirmacao !== "CANCELAR" || deletando} className="flex-1 py-3 rounded-xl font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 flex justify-center items-center">
+              <button onClick={handleConfirmDelete} disabled={textoConfirmacao !== "EXCLUIR" || deletando} className="flex-1 py-3 rounded-xl font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 flex justify-center items-center">
                 {deletando ? <Loader2 size={20} className="animate-spin" /> : "Sim, Excluir"}
               </button>
             </div>
@@ -244,11 +245,17 @@ export default function HospedeAdminPage() {
         </div>
       )}
 
-      {/* TOAST NOTIFICATION */}
       {sucessoFeedback && (
         <div className="fixed top-8 right-8 z-50 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-xl shadow-[0_8px_30px_rgba(16,185,129,0.15)] animate-fade-in">
           <CheckCircle2 size={24} className="text-emerald-500 shrink-0" />
           <p className="font-medium font-admin">{sucessoFeedback}</p>
+        </div>
+      )}
+
+      {erroFeedback && (
+        <div className="fixed top-8 right-8 z-50 flex items-center gap-3 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl shadow-[0_8px_30px_rgba(239,68,68,0.15)] animate-fade-in">
+          <AlertTriangle size={24} className="text-red-500 shrink-0" />
+          <p className="font-medium font-admin">{erroFeedback}</p>
         </div>
       )}
     </div>

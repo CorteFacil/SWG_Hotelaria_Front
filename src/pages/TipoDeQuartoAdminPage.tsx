@@ -217,12 +217,12 @@ export default function TipoDeQuartoAdminPage() {
             )}
 
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Digite <span className="text-red-500 font-bold select-all">CANCELAR</span>:</label>
-              <input type="text" value={textoConfirmacao} onChange={(e) => setTextoConfirmacao(e.target.value)} placeholder="CANCELAR" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 outline-none text-center font-bold tracking-widest uppercase" />
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Digite <span className="text-red-500 font-bold select-all">EXCLUIR</span>:</label>
+              <input type="text" value={textoConfirmacao} onChange={(e) => setTextoConfirmacao(e.target.value.toUpperCase())} placeholder="EXCLUIR" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 outline-none text-center font-bold tracking-widest uppercase" />
             </div>
             <div className="flex gap-3">
               <button onClick={fecharModalExclusao} className="flex-1 py-3 rounded-xl font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
-              <button onClick={handleConfirmDelete} disabled={textoConfirmacao !== "CANCELAR" || deletando} className="flex-1 py-3 rounded-xl font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 flex justify-center items-center">
+              <button onClick={handleConfirmDelete} disabled={textoConfirmacao !== "EXCLUIR" || deletando} className="flex-1 py-3 rounded-xl font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 flex justify-center items-center">
                 {deletando ? <Loader2 size={20} className="animate-spin" /> : "Sim, Excluir"}
               </button>
             </div>
