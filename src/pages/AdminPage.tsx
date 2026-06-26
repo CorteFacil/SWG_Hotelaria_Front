@@ -2,7 +2,7 @@ import { useState, ReactNode } from 'react'
 import { Link, useLocation } from 'wouter'
 import { 
   Menu, 
-  X, // <-- Adicionamos o ícone de Fechar
+  X, 
   LogOut, 
   ClipboardCheck, 
   CalendarDays, 
@@ -28,7 +28,7 @@ interface AdminProps {
 
 export default function AdminPage({ children }: AdminProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobileOpen, setIsMobileOpen] = useState(false) // <-- Novo estado para o celular
+  const [isMobileOpen, setIsMobileOpen] = useState(false) 
   const [, setLocation] = useLocation()
 
   const handleLogout = () => {
@@ -37,7 +37,6 @@ export default function AdminPage({ children }: AdminProps) {
     setLocation('/')
   }
 
-  // Função para fechar o menu no celular após o clique
   const handleMobileMenuClick = () => {
     setIsMobileOpen(false)
   }
@@ -47,7 +46,10 @@ export default function AdminPage({ children }: AdminProps) {
       
       {/* BARRA SUPERIOR MOBILE (Aparece apenas em telas pequenas) */}
       <div className="md:hidden absolute top-0 left-0 w-full h-20 bg-[#FFF3E3] border-b border-[#EF9B1B]/20 flex items-center justify-between px-6 z-30 shadow-sm">
-        <img src={logoSideBar} alt="Logo" className="w-32 h-auto object-contain" />
+        {/* LOGO MOBILE CLICÁVEL */}
+        <Link to="/admin">
+          <img src={logoSideBar} alt="Logo" className="w-32 h-auto object-contain cursor-pointer hover:opacity-80 transition-opacity" />
+        </Link>
         <button 
           onClick={() => setIsMobileOpen(true)}
           className="p-2.5 bg-[#FFF8EF] rounded-xl text-[#C47D0E] shadow-sm active:scale-95 transition-transform"
@@ -75,11 +77,12 @@ export default function AdminPage({ children }: AdminProps) {
         fixed inset-y-0 left-0 z-50 w-[85%] max-w-[340px] transform ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="h-28 flex items-center justify-between px-4 border-b border-[#EF9B1B]/10 shrink-0">
-          {/* Logo exibida quando expandido ou no mobile */}
+          
+          {/* LOGO SIDEBAR CLICÁVEL - Exibida quando expandido ou no mobile */}
           {(!isCollapsed || isMobileOpen) && (
-            <div className="flex items-center overflow-hidden w-full">
+            <Link to="/admin" onClick={handleMobileMenuClick} className="flex items-center overflow-hidden w-full cursor-pointer hover:opacity-80 transition-opacity">
               <img src={logoSideBar} alt="Logo" className="w-48 h-auto max-h-20 object-contain ml-2" />
-            </div>
+            </Link>
           )}
           
           {/* Botão de Recolher/Expandir do Desktop */}
@@ -159,7 +162,6 @@ export default function AdminPage({ children }: AdminProps) {
         </div>
       </aside>
 
-      {/* Adicionado o padding-top no mobile (pt-24) para o conteúdo não ficar escondido debaixo do cabeçalho novo */}
       <main className="flex-1 flex flex-col overflow-hidden relative pt-24 md:pt-0">
         <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scroll">
           <div className="bg-white rounded-[1.25rem] shadow-[0_8px_30px_rgba(34,32,32,0.04)] border border-gray-100 min-h-full p-6 lg:p-10">
@@ -171,7 +173,6 @@ export default function AdminPage({ children }: AdminProps) {
   )
 }
 
-// O MenuItem agora aceita uma propriedade onClick para notificar o componente pai
 function MenuItem({ to, icon, text, isCollapsed, onClick }: { to: string, icon: ReactNode, text: string, isCollapsed: boolean, onClick?: () => void }) {
   return (
     <Link 
