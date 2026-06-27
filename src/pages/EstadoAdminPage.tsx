@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   MapPin,
   Globe,
+  XCircle
 } from "lucide-react";
 import { atualizarEstado, criarEstado, excluirEstado, listarEstados } from "@/Api/estados";
 import { listarPaises } from "@/Api/paises";
@@ -20,6 +21,7 @@ export default function EstadoAdminPage() {
   const [estadoEditando, setEstadoEditando] = useState<Estado | null>(null);
   const [erroSubmitForm, setErroSubmitForm] = useState<string | undefined>(undefined);
   const [sucessoFeedback, setSucessoFeedback] = useState("");
+  const [conflitoFeedback, setConflitoFeedback] = useState("");
 
   const [busca, setBusca] = useState("");
   const [loadingDados, setLoadingDados] = useState(true);
@@ -53,6 +55,21 @@ export default function EstadoAdminPage() {
     setTimeout(() => setSucessoFeedback(""), 3000);
   }
 
+  function mostrarConflito(
+
+    mensagem: string
+
+  ) {
+
+    setConflitoFeedback(mensagem);
+
+    setTimeout(() => {
+
+      setConflitoFeedback("");
+
+    }, 5000);
+
+  }
   async function handleSubmitForm(data: any) {
     setErroSubmitForm(undefined);
     try {
@@ -96,8 +113,11 @@ export default function EstadoAdminPage() {
       fecharModalExclusao();
       if (estadoEditando?.id === itemParaExcluir.id) handleCancel();
       mostrarSucesso("Estado excluído permanentemente.");
-    } catch {
-      alert("Erro ao excluir. O estado pode estar vinculado a hóspedes.");
+    } catch (err) {
+      fecharModalExclusao();
+      mostrarConflito(
+        "Não é possível excluir um estado que possui hóspedes!"
+      );
     } finally {
       setDeletando(false);
     }
@@ -108,15 +128,29 @@ export default function EstadoAdminPage() {
     setTextoConfirmacao("");
   }
 
-  const estadosFiltrados = estados.filter((estado) => {
-    if (!busca) return true;
-    const termo = busca.toLowerCase();
-    return (
-      estado.nomeEstado.toLowerCase().includes(termo) ||
-      estado.siglaUf.toLowerCase().includes(termo) ||
-      (estado.regiaoGeografica ?? "").toLowerCase().includes(termo)
-    );
-  });
+  /*   const estadosFiltrados = estados.filter((estado) => {
+      if (!busca) return true;
+      const termo = busca.toLowerCase();
+      return (
+        estado.nomeEstado.toLowerCase().includes(termo) ||
+        estado.siglaUf.toLowerCase().includes(termo) ||
+        (estado.regiaoGeografica ?? "").toLowerCase().includes(termo)
+      );
+    }); */
+
+  const estadosFiltrados = [...estados]
+    .sort((a, b) => a.nomeEstado.localeCompare(b.nomeEstado, "pt-BR"))
+    .filter((estado) => {
+      if (!busca) return true;
+
+      const termo = busca.toLowerCase();
+
+      return (
+        estado.nomeEstado.toLowerCase().includes(termo) ||
+        estado.siglaUf.toLowerCase().includes(termo) ||
+        (estado.regiaoGeografica ?? "").toLowerCase().includes(termo)
+      );
+    });
 
   return (
     <div className="max-w-8xl w-full animate-fade-in relative">
@@ -149,7 +183,7 @@ export default function EstadoAdminPage() {
           </div>
 
           {/* COLUNA DIREITA — Lista */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col overflow-hidden sticky top-6 max-h-[80vh]">
+          <div className="bg-white rounded-xl border border-[#EF9B1B] flex flex-col overflow-hidden sticky top-6 max-h-[80vh]">
             <div className="p-6 border-b border-gray-100 bg-gray-50/50">
               <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Estados Registrados</h3>
               <div className="relative">
@@ -237,17 +271,16 @@ export default function EstadoAdminPage() {
             </div>
             <p className="text-gray-600 mb-4">
               Tem certeza que deseja excluir <strong className="text-[#222020]">{itemParaExcluir.nome}</strong>?
-              Esta ação não pode ser desfeita.
             </p>
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-                Digite <span className="text-red-500 font-bold select-all">CANCELAR</span> para confirmar:
+                Digite <span className="text-red-500 font-bold select-all">EXCLUIR</span>:
               </label>
               <input
                 type="text"
                 value={textoConfirmacao}
                 onChange={(e) => setTextoConfirmacao(e.target.value)}
-                placeholder="CANCELAR"
+                placeholder="EXCLUIR"
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all text-center font-bold tracking-widest uppercase"
               />
             </div>
@@ -260,7 +293,7 @@ export default function EstadoAdminPage() {
               </button>
               <button
                 onClick={handleConfirmDelete}
-                disabled={textoConfirmacao !== "CANCELAR" || deletando}
+                disabled={textoConfirmacao !== "EXCLUIR" || deletando}
                 className="flex-1 py-3 rounded-xl font-medium bg-red-500 text-white shadow-md hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center"
               >
                 {deletando ? <Loader2 size={20} className="animate-spin" /> : "Sim, Excluir"}
@@ -276,6 +309,24 @@ export default function EstadoAdminPage() {
           <CheckCircle2 size={24} className="text-emerald-500 shrink-0" />
           <p className="font-medium font-admin">{sucessoFeedback}</p>
         </div>
+      )}
+
+      {conflitoFeedback && (
+
+        <div className="fixed top-8 right-8 bg-red-50 border border-red-200 rounded-xl px-6 py-4 shadow-lg flex items-center gap-3 z-50">
+
+          <XCircle
+            className="text-red-500"
+          />
+
+          <span className="text-red-700 font-medium">
+
+            {conflitoFeedback}
+
+          </span>
+
+        </div>
+
       )}
     </div>
   );
