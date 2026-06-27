@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 
 import QuartoForm from "../components/QuartoForm";
 
+import { atualizarQuarto, criarQuarto, excluirQuarto, listarQuartos } from "@/Api/quartos";
+import { listarTipoDeQuarto } from "@/Api/tiposdequarto";
+
 import type {
     Quarto,
     TipoDeQuarto
@@ -19,18 +22,33 @@ import {
     Layers,
     XCircle
 } from "lucide-react";
-import { atualizarQuarto, criarQuarto, excluirQuarto, listarQuartos } from "@/Api/quartos";
-import { listarTipoDeQuarto } from "@/Api/tiposdequarto";
 
 export default function QuartoAdminPage() {
 
     const [quartos, setQuartos] = useState<Quarto[]>([]);
-    const [tiposDeQuarto, setTiposDeQuarto] = useState<TipoDeQuarto[]>([]);
-    const [quartoEditando, setQuartoEditando] = useState<Quarto | null>(null);
-    const [busca, setBusca] = useState("");
-    const [loadingDados, setLoadingDados] = useState(true);
-    const [erroPagina, setErroPagina] = useState("");
-    const [sucessoFeedback, setSucessoFeedback] = useState("");
+
+    const [tiposDeQuarto, setTiposDeQuarto] =
+        useState<TipoDeQuarto[]>([]);
+
+    const [quartoEditando,
+        setQuartoEditando] =
+        useState<Quarto | null>(null);
+
+    const [busca,
+        setBusca] =
+        useState("");
+
+    const [loadingDados,
+        setLoadingDados] =
+        useState(true);
+
+    const [erroPagina,
+        setErroPagina] =
+        useState("");
+
+    const [sucessoFeedback,
+        setSucessoFeedback] =
+        useState("");
 
     const [conflitoFeedback,
         setConflitoFeedback] =
@@ -39,78 +57,151 @@ export default function QuartoAdminPage() {
     const [
         itemParaExcluir,
         setItemParaExcluir
-    ] = useState < {
-        const [itemParaExcluir, setItemParaExcluir] = useState<{
-            id: number,
-            numero: string
-        } | null>(null);
+    ] = useState<{
+        id: number,
+        numero: string
+    } | null>(null);
 
-        const [textoConfirmacao, setTextoConfirmacao] = useState("");
+    const [
+        textoConfirmacao,
+        setTextoConfirmacao
+    ] = useState("");
 
-        const [deletando, setDeletando] = useState(false);
+    const [
+        deletando,
+        setDeletando
+    ] = useState(false);
 
-        useEffect(() => {
+    useEffect(() => {
+
         carregarDados();
+
     }, []);
 
     async function carregarDados() {
+
         try {
+
             const [
+
                 quartosData,
+
                 tiposData
+
             ] = await Promise.all([
+
                 listarQuartos(),
+
                 listarTipoDeQuarto()
+
             ]);
+
             setQuartos(quartosData);
+
             setTiposDeQuarto(tiposData);
+
         }
+
         catch {
+
             setErroPagina(
+
                 "Falha ao carregar os quartos."
+
             );
+
         }
+
         finally {
+
             setLoadingDados(false);
+
         }
+
     }
 
     function mostrarSucesso(
+
         mensagem: string
+
     ) {
+
         setSucessoFeedback(mensagem);
+
         setTimeout(() => {
+
             setSucessoFeedback("");
-        }, 3000);
+
+        }, 5000);
+
+    }
+
+    function mostrarConflito(
+
+        mensagem: string
+
+    ) {
+
+        setConflitoFeedback(mensagem);
+
+        setTimeout(() => {
+
+            setConflitoFeedback("");
+
+        }, 5000);
 
     }
 
     async function handleSubmitForm(
+
         data: any
+
     ) {
+
         try {
+
             if (
+
                 quartoEditando
+
             ) {
+
                 await atualizarQuarto(
-                    String(quartoEditando.id),
+
+                    quartoEditando.id,
+
                     data
+
                 );
+
                 mostrarSucesso(
+
                     "Quarto atualizado com sucesso!"
-                );
-            }
-            else {
-                await criarQuarto(
-                    data
-                );
-                mostrarSucesso(
-                    "Quarto cadastrado com sucesso!"
+
                 );
 
             }
+
+            else {
+
+                await criarQuarto(
+
+                    data
+
+                );
+
+                mostrarSucesso(
+
+                    "Quarto cadastrado com sucesso!"
+
+                );
+
+            }
+
             handleCancel();
+
             carregarDados();
+
         }
 
         catch (err) {
@@ -131,28 +222,30 @@ export default function QuartoAdminPage() {
 
                 );
             }
-            alert(
-                (err as Error).message
-            );
-
         }
 
     }
 
     function handleCancel() {
+
         setQuartoEditando(null);
 
     }
 
     function handleEditar(
+
         quarto: Quarto
 
     ) {
 
         setQuartoEditando(quarto);
+
         window.scrollTo({
+
             top: 0,
+
             behavior: "smooth"
+
         });
 
     }
@@ -160,8 +253,11 @@ export default function QuartoAdminPage() {
     async function handleConfirmDelete() {
 
         if (
+
             !itemParaExcluir
+
         )
+
             return;
 
         setDeletando(true);
@@ -169,7 +265,9 @@ export default function QuartoAdminPage() {
         try {
 
             await excluirQuarto(
-                String(itemParaExcluir.id)
+
+                itemParaExcluir.id
+
             );
 
             setQuartos(
@@ -196,12 +294,12 @@ export default function QuartoAdminPage() {
 
         }
 
-        catch {
+        catch(err) {
 
-            alert(
-
-                "Não foi possível excluir."
-
+            fecharModal();
+            
+            mostrarConflito(
+                "Não é possível excluir um quarto ocupado!"
             );
 
         }

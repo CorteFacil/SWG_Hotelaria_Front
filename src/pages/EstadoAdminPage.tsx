@@ -75,10 +75,10 @@ export default function EstadoAdminPage() {
     try {
       if (estadoEditando) {
         await atualizarEstado(String(estadoEditando.id), data);
-        mostrarSucesso("Estado atualizado com sucesso! ✨");
+        mostrarSucesso("Estado atualizado com sucesso!");
       } else {
         await criarEstado(data);
-        mostrarSucesso("Estado cadastrado com sucesso! ✨");
+        mostrarSucesso("Estado cadastrado com sucesso!");
       }
       await carregarDados();
       handleCancel();

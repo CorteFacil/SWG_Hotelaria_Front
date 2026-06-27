@@ -1,5 +1,5 @@
-
 const BASE_URL = 'https://swg-hotelaria.onrender.com';
+/* const BASE_URL = 'http://localhost:3333'; */
 
 if (!BASE_URL) {
     throw new Error(

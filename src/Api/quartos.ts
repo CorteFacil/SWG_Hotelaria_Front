@@ -21,12 +21,12 @@ export function criarQuarto(payload: QuartoPayLoad): Promise<Quarto> {
     return pedir<Quarto>(RECURSO, { metodo: 'POST', corpo: (payload) });
 }
 
-export function atualizarQuarto(id: string, payload: QuartoPayLoad): Promise<Quarto> {
+export function atualizarQuarto(id: number, payload: QuartoPayLoad): Promise<Quarto> {
     return pedir<Quarto>(`${RECURSO}/${id}`, { metodo: 'PUT', corpo: payload })
 
 }
 
 
-export function excluirQuarto(id: string): Promise<Quarto> {
+export function excluirQuarto(id: number): Promise<Quarto> {
     return pedir<Quarto>(`${RECURSO}/${id}`, { metodo: "DELETE" })
 }
