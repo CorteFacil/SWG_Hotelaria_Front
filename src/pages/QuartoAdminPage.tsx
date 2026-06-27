@@ -18,7 +18,8 @@ import {
     CheckCircle2,
     BedDouble,
     Building2,
-    Layers
+    Layers,
+    XCircle
 } from "lucide-react";
 
 export default function QuartoAdminPage() {
@@ -46,6 +47,10 @@ export default function QuartoAdminPage() {
 
     const [sucessoFeedback,
         setSucessoFeedback] =
+        useState("");
+
+    const [conflitoFeedback,
+        setConflitoFeedback] =
         useState("");
 
     const [
@@ -126,7 +131,23 @@ export default function QuartoAdminPage() {
 
             setSucessoFeedback("");
 
-        }, 3000);
+        }, 5000);
+
+    }
+
+    function mostrarConflito(
+
+        mensagem: string
+
+    ) {
+
+        setConflitoFeedback(mensagem);
+
+        setTimeout(() => {
+
+            setConflitoFeedback("");
+
+        }, 5000);
 
     }
 
@@ -184,12 +205,22 @@ export default function QuartoAdminPage() {
 
         catch (err) {
 
-            alert(
+            if ((err as Error).message.includes("Não podem existir dois registros com a mesma chave!")) {
 
-                (err as Error).message
+                mostrarConflito(
 
-            );
+                    "Não podem existir dois registros com a mesma chave!"
 
+                );
+
+            } else {
+
+                alert(
+
+                    (err as Error).message
+
+                );
+            }
         }
 
     }
@@ -288,7 +319,7 @@ export default function QuartoAdminPage() {
 
     }
 
-    const quartosFiltrados =
+    /* const quartosFiltrados =
 
         quartos.filter(
 
@@ -334,7 +365,26 @@ export default function QuartoAdminPage() {
 
             }
 
-        );
+        ); */
+
+    const quartosFiltrados = [...quartos]
+        .sort((a, b) => {
+            if (a.andar !== b.andar) {
+                return a.andar - b.andar;
+            }
+
+            return Number(a.numero) - Number(b.numero);
+        })
+        .filter(quarto => {
+            if (!busca) return true;
+
+            const termo = busca.toLowerCase();
+
+            return (
+                quarto.numero.toString().includes(termo) ||
+                quarto.tipoDeQuarto?.nome?.toLowerCase().includes(termo)
+            );
+        });
 
     return (
         <div className="max-w-8xl w-full animate-fade-in relative">
@@ -399,7 +449,7 @@ export default function QuartoAdminPage() {
 
                         <div className="p-6 border-b border-gray-100 bg-gray-50/50">
 
-                            <h3 className="text-lg font-bold text-[#222020] mb-4">
+                            <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">
 
                                 Quartos Cadastrados
 
@@ -682,6 +732,24 @@ export default function QuartoAdminPage() {
                     <span>
 
                         {sucessoFeedback}
+
+                    </span>
+
+                </div>
+
+            )}
+
+            {conflitoFeedback && (
+
+                <div className="fixed top-8 right-8 bg-red-50 border border-red-200 rounded-xl px-6 py-4 shadow-lg flex items-center gap-3 z-50">
+
+                    <XCircle
+                        className="text-red-500"
+                    />
+
+                    <span className="text-red-700 font-medium">
+
+                        {conflitoFeedback}
 
                     </span>
 
