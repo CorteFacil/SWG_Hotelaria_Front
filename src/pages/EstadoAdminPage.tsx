@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import EstadoForm from "../components/EstadoForm";
-import { api } from "../api";
-import type { Estado, PaisIso } from "../types";
+import EstadoForm from "../components/EstadoForm";;
+import type { Estado, Pais } from "../types";
 import {
   Loader2,
   Search,
@@ -12,11 +11,12 @@ import {
   MapPin,
   Globe,
 } from "lucide-react";
+import { atualizarEstado, criarEstado, excluirEstado, listarEstados } from "@/Api/estados";
+import { listarPaises } from "@/Api/paises";
 
 export default function EstadoAdminPage() {
   const [estados, setEstados] = useState<Estado[]>([]);
-  const [paises, setPaises] = useState<PaisIso[]>([]);
-
+  const [paises, setPaises] = useState<Pais[]>([]);
   const [estadoEditando, setEstadoEditando] = useState<Estado | null>(null);
   const [erroSubmitForm, setErroSubmitForm] = useState<string | undefined>(undefined);
   const [sucessoFeedback, setSucessoFeedback] = useState("");
@@ -36,8 +36,8 @@ export default function EstadoAdminPage() {
   async function carregarDados() {
     try {
       const [estadosData, paisesData] = await Promise.all([
-        api.getEstados(),
-        api.getPaises(),
+        listarEstados(),
+        listarPaises(),
       ]);
       setEstados(estadosData);
       setPaises(paisesData);
@@ -57,10 +57,10 @@ export default function EstadoAdminPage() {
     setErroSubmitForm(undefined);
     try {
       if (estadoEditando) {
-        await api.updateEstado(estadoEditando.id, data);
+        await atualizarEstado(String(estadoEditando.id), data);
         mostrarSucesso("Estado atualizado com sucesso! ✨");
       } else {
-        await api.createEstado(data);
+        await criarEstado(data);
         mostrarSucesso("Estado cadastrado com sucesso! ✨");
       }
       await carregarDados();
@@ -91,7 +91,7 @@ export default function EstadoAdminPage() {
     if (!itemParaExcluir) return;
     setDeletando(true);
     try {
-      await api.deleteEstado(itemParaExcluir.id);
+      await excluirEstado(String(itemParaExcluir.id));
       setEstados(estados.filter((e) => e.id !== itemParaExcluir.id));
       fecharModalExclusao();
       if (estadoEditando?.id === itemParaExcluir.id) handleCancel();

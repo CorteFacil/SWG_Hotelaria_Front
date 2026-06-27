@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import EstadiaForm from "../components/EstadiaForm";
-import { api } from "../api";
 import type { Estadia, Reserva, Funcionario, Quarto } from "../types";
 import {
   Loader2,
@@ -15,6 +14,10 @@ import {
   DollarSign,
   LogIn,
 } from "lucide-react";
+import { listarReservas } from "@/Api/reservas";
+import { listarFuncionarios } from "@/Api/funcionarios";
+import { listarQuartos } from "@/Api/quartos";
+import { atualizarEstadia, criarEstadia, excluirEstadia, listarEstadias } from "@/Api/estadias";
 
 export default function EstadiaAdminPage() {
   const [reservas, setReservas] = useState<Reserva[]>([]);
@@ -41,10 +44,10 @@ export default function EstadiaAdminPage() {
   async function carregarDados() {
     try {
       const [loadedReservas, loadedFuncionarios, loadedQuartos, loadedEstadias] = await Promise.all([
-        api.getReservas(),
-        api.getFuncionarios(),
-        api.getQuartos(),
-        api.getEstadias(),
+        listarReservas(),
+        listarFuncionarios(),
+        listarQuartos(),
+        listarEstadias()
       ]);
       setReservas(loadedReservas);
       setFuncionarios(loadedFuncionarios);
@@ -67,10 +70,10 @@ export default function EstadiaAdminPage() {
     console.log('[EstadiaAdmin] payload enviado:', JSON.stringify(data, null, 2));
     try {
       if (estadiaEditando) {
-        await api.updateEstadia(estadiaEditando.id, data);
+        await atualizarEstadia(String(estadiaEditando.id), data);
         mostrarSucesso("Estadia atualizada com sucesso!");
       } else {
-        await api.createEstadia(data);
+        await criarEstadia(data);
         mostrarSucesso("Estadia registrada com sucesso!");
       }
       await carregarDados();
@@ -101,7 +104,7 @@ export default function EstadiaAdminPage() {
     if (!estadiaParaExcluir) return;
     setDeletando(true);
     try {
-      await api.deleteEstadia(estadiaParaExcluir.id);
+      await excluirEstadia(String(estadiaParaExcluir.id));
       setEstadias(estadias.filter((e) => e.id !== estadiaParaExcluir.id));
       fecharModalExclusao();
       if (estadiaEditando?.id === estadiaParaExcluir.id) handleCancel();

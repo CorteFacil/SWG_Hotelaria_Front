@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "../api";
+
 import {
   Loader2,
   TrendingUp,
@@ -10,6 +10,7 @@ import {
   MapPin,
   Users,
 } from "lucide-react";
+import { listarRelatorioProcedencia } from "@/Api/relatorios";
 
 export default function RelatorioProcedenciaPage() {
   const [resultados, setResultados] = useState<any[]>([]);
@@ -22,7 +23,7 @@ export default function RelatorioProcedenciaPage() {
     setErro("");
     setBuscou(true);
     try {
-      const dados = await api.getRelatorioProcedencia();
+      const dados = await listarRelatorioProcedencia()
       setResultados(Array.isArray(dados) ? dados : []);
     } catch (err) {
       let msg = (err as Error).message;
@@ -47,7 +48,7 @@ export default function RelatorioProcedenciaPage() {
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valor);
 
   const totalEstadias = resultados.reduce((acc, curr) => acc + Number(curr.qtdestadias ?? 0), 0);
-  const totalReceita  = resultados.reduce((acc, curr) => acc + Number(curr.receitatotal ?? 0), 0);
+  const totalReceita = resultados.reduce((acc, curr) => acc + Number(curr.receitatotal ?? 0), 0);
 
   // Agrupa por país para destacar os totais por país
   const paisesMapa = resultados.reduce((acc: Record<string, number>, curr) => {

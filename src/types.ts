@@ -1,4 +1,4 @@
-export interface PaisIso {
+export interface Pais {
   id: number
   nome: string
   sigla_iso2: string
@@ -6,14 +6,20 @@ export interface PaisIso {
   ddi_telefone: number
 }
 
+export type PaisPayLoad = Omit<Pais, 'id'>
+
 export interface Estado {
   id: number
   nomeEstado: string
   siglaUf: string
   regiaoGeografica?: string
   paisisoId?: number
-  paisiso?: PaisIso
+  paisiso?: Pais
 }
+
+
+export type EstadoPayLoad = Omit<Estado, 'id'>
+
 
 export interface Hospede {
   id: number
@@ -28,6 +34,10 @@ export interface Hospede {
   atualizadoEm?: string
 }
 
+
+export type HospedePayLoad = Omit<Hospede, 'id'>
+
+
 export interface TipoDeQuarto {
   id: number
   nome: string
@@ -38,6 +48,10 @@ export interface TipoDeQuarto {
   tamanho: number
 }
 
+
+export type TipoDeQuartoPayLoad = Omit<TipoDeQuarto, 'id'>
+
+
 export interface Quarto {
   id: number
   numero: string
@@ -47,13 +61,17 @@ export interface Quarto {
   tipoDeQuarto?: TipoDeQuarto
 }
 
+
+export type QuartoPayLoad = Omit<Quarto, 'id'>
+
+
 export interface Reserva {
   id: number
   entradaAcomodacao: string
   saidaAcomodacao: string
   numeroPessoas: number
   observacao?: string
-  status: number 
+  status: number
   hospedeId: number
   tipoDeQuartoId: number
   hospede?: Hospede
@@ -61,6 +79,8 @@ export interface Reserva {
   criadoEm?: string
   atualizadoEm?: string
 }
+
+export type ReservaPayLoad = Omit<Reserva, 'id'>
 
 export interface Estadia {
   id: number
@@ -74,6 +94,8 @@ export interface Estadia {
   funcionario?: Funcionario
   quarto?: Quarto
 }
+export type EstadiaPayLoad = Omit<Estadia, 'id'>
+
 
 export interface Funcionario {
   id: number
@@ -84,12 +106,16 @@ export interface Funcionario {
   salario: number
 }
 
+export type FuncionarioPayLoad = Omit<Funcionario, 'id'>
+
 export interface OrdemLimpeza {
-  id: number;
-  status: string;
-  observacao?: string;
-  inicioOrdem: string;
-  fimOrdem: string;
-  funcionarioId: number;
-  quartoId: number;
+  id: number
+  quartoId: number
+  funcionarioId: number
+  status: string
+  observacao?: string
+  inicio: string
+  fim: string
 }
+
+export type OrdemLimpezaPayLoad = Omit<OrdemLimpeza, 'id'>

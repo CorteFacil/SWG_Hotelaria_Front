@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { api } from "@/api";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import room1Image from "@/assets/room-1.png";
 import room2Image from "@/assets/room-2.png";
 import room3Image from "@/assets/room-3.png";
+import { listarTipoDeQuarto } from "@/Api/tiposdequarto";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,27 +40,26 @@ export function RoomsSection() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    api.getTiposDeQuarto()
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          const ultimos = data.slice(-3).reverse().map((quarto) => ({
-            id: quarto.id,
-            name: quarto.nome,
-            detail: `${quarto.tamanho}m² · ${quarto.tipoCama} · Até ${quarto.capacidadeMax} ${quarto.capacidadeMax === 1 ? 'pessoa' : 'pessoas'}`,
-            description: quarto.descricao,
-            price: `A partir de R$ ${Number(quarto.precoDiaria).toFixed(2).replace('.', ',')}/noite`
-          }));
-          setRooms(ultimos);
-          setTimeout(() => {
-            ScrollTrigger.refresh();
-          }, 150);
-        }
-      })
-      .catch(() => {});
+    listarTipoDeQuarto().then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        const ultimos = data.slice(-3).reverse().map((quarto) => ({
+          id: quarto.id,
+          name: quarto.nome,
+          detail: `${quarto.tamanho}m² · ${quarto.tipoCama} · Até ${quarto.capacidadeMax} ${quarto.capacidadeMax === 1 ? 'pessoa' : 'pessoas'}`,
+          description: quarto.descricao,
+          price: `A partir de R$ ${Number(quarto.precoDiaria).toFixed(2).replace('.', ',')}/noite`
+        }));
+        setRooms(ultimos);
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 150);
+      }
+    })
+      .catch(() => { });
   }, []);
 
   return (
-    <section 
+    <section
       id="quartos"
       className="w-full bg-[#FFF8EF] py-[clamp(3rem,5vw,5rem)]"
       data-testid="section-rooms"
@@ -80,16 +79,16 @@ export function RoomsSection() {
 
         <div className="gsap-rooms-container flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 md:gap-8 pb-8 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0 custom-scroll">
           {rooms.map((room, index) => (
-            <div 
+            <div
               key={index}
               onClick={() => setLocation('/reserva')}
               className="gsap-room-card flex-none w-[320px] md:w-auto h-[480px] md:h-[520px] rounded-[1.25rem] bg-[#FFF3E3] overflow-hidden flex flex-col snap-start group transition-all duration-350 ease-out hover:-translate-y-[6px] hover:shadow-[0_20px_60px_rgba(34,32,32,0.10)] cursor-pointer"
               data-testid={`card-room-${room.id}`}
             >
               <div className="h-[65%] w-full overflow-hidden relative">
-                <img 
-                  src={staticImages[index % staticImages.length]} 
-                  alt={room.name} 
+                <img
+                  src={staticImages[index % staticImages.length]}
+                  alt={room.name}
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                   loading="lazy"
                 />

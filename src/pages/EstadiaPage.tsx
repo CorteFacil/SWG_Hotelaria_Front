@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
-import { api } from '../api'
 import type { Estadia, Reserva, Funcionario, Quarto } from '../types'
 import EstadiaForm from '../components/EstadiaForm'
 import styles from './Page.module.css'
+import { listarReservas } from '@/Api/reservas'
+import { listarFuncionarios } from '@/Api/funcionarios'
+import { listarQuartos } from '@/Api/quartos'
+import { criarEstadia, listarEstadias } from '@/Api/estadias'
 
 export default function EstadiaPage() {
   const [reservas, setReservas] = useState<Reserva[]>([])
@@ -25,10 +28,10 @@ export default function EstadiaPage() {
         loadedQuartos,
         loadedEstadias
       ] = await Promise.all([
-        api.getReservas(),
-        api.getFuncionarios(),
-        api.getQuartos(),
-        api.getEstadias()
+        listarReservas(),
+        listarFuncionarios(),
+        listarQuartos(),
+        listarEstadias()
       ])
 
       setReservas(loadedReservas)
@@ -42,7 +45,7 @@ export default function EstadiaPage() {
 
   async function handleCreateEstadia(data: Omit<Estadia, 'id'>) {
     try {
-      const created = await api.createEstadia(data)
+      const created = await criarEstadia(data)
       setEstadias((prev) => [...prev, created])
       setFeedback('Estadia cadastrada com sucesso.')
       setError('')
@@ -67,7 +70,7 @@ export default function EstadiaPage() {
           quartos={quartos}
           error={error}
           onSubmit={handleCreateEstadia}
-          onCancel={() => {}}
+          onCancel={() => { }}
         />
 
         <section className="bg-light p-4">

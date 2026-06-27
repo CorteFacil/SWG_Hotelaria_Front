@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { api } from "../api";
 import { Loader2, CalendarDays, TrendingUp, DollarSign, AlertCircle, BarChart3 } from "lucide-react";
+import { listarRelatorioFaturamento } from "@/Api/reservas";
 
 export default function RelatorioFaturamentoPage() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
-  
+
   const [resultados, setResultados] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -18,14 +18,14 @@ export default function RelatorioFaturamentoPage() {
     setBuscou(true);
 
     try {
-      const dados = await api.getRelatorioFaturamento(
-        dataInicio || undefined, 
+      const dados = await listarRelatorioFaturamento(
+        dataInicio || undefined,
         dataFim || undefined
       );
       setResultados(dados || []);
     } catch (err) {
       let msg = (err as Error).message;
-      
+
       try {
         while (typeof msg === 'string' && msg.trim().startsWith('{')) {
           const parsed = JSON.parse(msg);
@@ -37,9 +37,9 @@ export default function RelatorioFaturamentoPage() {
             break;
           }
         }
-      } catch (e) { 
+      } catch (e) {
       }
-      
+
       setErro(msg);
       setResultados([]);
     } finally {
@@ -67,7 +67,7 @@ export default function RelatorioFaturamentoPage() {
         <h3 className="text-lg font-bold text-[#222020] font-admin mb-4 flex items-center gap-2">
           <TrendingUp className="text-[#EF9B1B]" size={20} /> Filtros de Período
         </h3>
-        
+
         <form onSubmit={handleGerarRelatorio} className="flex flex-col md:flex-row gap-4 items-end">
           <div className="w-full md:w-1/3 space-y-2">
             <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Data Inicial (Opcional)</label>
@@ -120,8 +120,8 @@ export default function RelatorioFaturamentoPage() {
               </div>
             ) : erro ? (
               <div className="p-8 flex flex-col items-center text-center">
-                  <AlertCircle size={40} className="text-red-400 mb-3" />
-                  <p className="text-red-600 font-medium text-lg">{erro}</p>
+                <AlertCircle size={40} className="text-red-400 mb-3" />
+                <p className="text-red-600 font-medium text-lg">{erro}</p>
               </div>
             ) : resultados.length === 0 ? (
               <div className="p-16 text-center text-gray-500 font-medium">
@@ -142,7 +142,7 @@ export default function RelatorioFaturamentoPage() {
                     {resultados.map((item, index) => {
                       const tipoAcomodacao = item.tipoAcomodacao || item.tipoacomodacao;
                       const quantidadeReservas = item.quantidadeReservas || item.quantidadereservas;
-                      
+
                       // FORÇAR A CONVERSÃO PARA NÚMERO AQUI:
                       const precoDiaria = Number(item.precoDiaria || item.precodiaria || 0);
                       const totalProjetado = Number(item.totalProjetado || item.totalprojetado || 0);

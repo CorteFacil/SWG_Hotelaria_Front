@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { api } from "../api";
 import type { Hospede, TipoDeQuarto } from "../types";
 import { Loader2, Search, FileText, BedDouble, UserCircle, AlertCircle } from "lucide-react";
+import { listarHospedes } from "@/Api/hospedes";
+import { listarTipoDeQuarto } from "@/Api/tiposdequarto";
+import { listarRelatorioReservasPeriodo } from "@/Api/reservas";
 
 export default function RelatorioReservasPage() {
   const [hospedes, setHospedes] = useState<Hospede[]>([]);
@@ -11,7 +13,7 @@ export default function RelatorioReservasPage() {
   const [dataFim, setDataFim] = useState("");
   const [hospedeId, setHospedeId] = useState("");
   const [tipoDeQuartoId, setTipoDeQuartoId] = useState("");
-  
+
   const [resultados, setResultados] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -19,7 +21,7 @@ export default function RelatorioReservasPage() {
 
   useEffect(() => {
     // Carrega hospedes e tipos de quarto para popular os filtros
-    Promise.all([api.getHospedes(), api.getTiposDeQuarto()])
+    Promise.all([listarHospedes(), listarTipoDeQuarto()])
       .then(([hospedesData, tiposData]) => {
         setHospedes(hospedesData);
         setTipos(tiposData);
@@ -34,16 +36,16 @@ export default function RelatorioReservasPage() {
     setBuscou(true);
 
     try {
-      const dados = await api.getRelatorioReservasPeriodo(
-        dataInicio || undefined, 
+      const dados = await listarRelatorioReservasPeriodo(
+        dataInicio || undefined,
         dataFim || undefined,
-        Number(hospedeId) || undefined,
-        Number(tipoDeQuartoId) || undefined
+        hospedeId || undefined,
+        tipoDeQuartoId || undefined
       );
       setResultados(dados || []);
     } catch (err) {
       let msg = (err as Error).message;
-      
+
       try {
         while (typeof msg === 'string' && msg.trim().startsWith('{')) {
           const parsed = JSON.parse(msg);
@@ -55,9 +57,9 @@ export default function RelatorioReservasPage() {
             break;
           }
         }
-      } catch (e) { 
+      } catch (e) {
       }
-      
+
       setErro(msg);
       setResultados([]);
     } finally {
@@ -81,9 +83,9 @@ export default function RelatorioReservasPage() {
         <h3 className="text-lg font-bold text-[#222020] font-admin mb-4 flex items-center gap-2">
           <Search className="text-[#EF9B1B]" size={20} /> Filtros de Busca
         </h3>
-        
+
         <form onSubmit={handleGerarRelatorio} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-          
+
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-[#C47D0E] uppercase tracking-wider">Data Inicial</label>
             <input type="date" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)}
@@ -128,19 +130,19 @@ export default function RelatorioReservasPage() {
           </div>
 
           {loading ? (
-             <div className="flex flex-col items-center justify-center py-16">
-               <Loader2 className="w-8 h-8 text-[#EF9B1B] animate-spin mb-4" />
-               <p className="text-gray-500 font-medium">Buscando dados...</p>
-             </div>
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 text-[#EF9B1B] animate-spin mb-4" />
+              <p className="text-gray-500 font-medium">Buscando dados...</p>
+            </div>
           ) : erro ? (
-             <div className="p-8 flex flex-col items-center text-center">
-                <AlertCircle size={40} className="text-red-400 mb-3" />
-                <p className="text-red-600 font-medium text-lg">{erro}</p>
-             </div>
+            <div className="p-8 flex flex-col items-center text-center">
+              <AlertCircle size={40} className="text-red-400 mb-3" />
+              <p className="text-red-600 font-medium text-lg">{erro}</p>
+            </div>
           ) : resultados.length === 0 ? (
-             <div className="p-16 text-center text-gray-500 font-medium">
-               Nenhuma reserva encontrada para o período/filtros informados.
-             </div>
+            <div className="p-16 text-center text-gray-500 font-medium">
+              Nenhuma reserva encontrada para o período/filtros informados.
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -169,15 +171,14 @@ export default function RelatorioReservasPage() {
                           <UserCircle size={16} className="text-[#EF9B1B]" /> {nomeHospede}
                         </td>
                         <td className="p-4 text-sm text-gray-600">
-                          <span className="flex items-center gap-2"><BedDouble size={14} className="text-gray-400"/> {tipoQuarto}</span>
+                          <span className="flex items-center gap-2"><BedDouble size={14} className="text-gray-400" /> {tipoQuarto}</span>
                         </td>
                         <td className="p-4 text-sm text-gray-600">
                           {formatarData(dataEntrada)} até {formatarData(dataSaida)}
                         </td>
                         <td className="p-4">
-                          <span className={`text-[10px] font-bold px-2.5 py-1 border rounded-md uppercase tracking-wider whitespace-nowrap ${
-                            item.status === 'Confirmada' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-orange-100 text-orange-700 border-orange-200'
-                          }`}>
+                          <span className={`text-[10px] font-bold px-2.5 py-1 border rounded-md uppercase tracking-wider whitespace-nowrap ${item.status === 'Confirmada' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-orange-100 text-orange-700 border-orange-200'
+                            }`}>
                             {item.status}
                           </span>
                         </td>

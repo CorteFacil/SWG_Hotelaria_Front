@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { api } from '../api'
 import type { Estado, Pais } from '../types'
 import EstadoForm from '../components/EstadoForm'
 import styles from './Page.module.css'
+import { criarEstado, listarEstados } from '@/Api/estados'
+import { listarPaises } from '@/Api/paises'
 
 export default function EstadoPage() {
   const [estados, setEstados] = useState<Estado[]>([])
@@ -17,8 +18,8 @@ export default function EstadoPage() {
   async function loadEstados() {
     try {
       const [loadedEstados, loadedPaises] = await Promise.all([
-        api.getEstados(),
-        api.getPaises()
+        listarEstados(),
+        listarPaises()
       ])
 
       setEstados(loadedEstados)
@@ -30,7 +31,7 @@ export default function EstadoPage() {
 
   async function handleCreateEstado(data: Omit<Estado, 'id'>) {
     try {
-      const created = await api.createEstado(data)
+      const created = await criarEstado(data)
 
       setEstados(prev => [...prev, created])
 
@@ -58,8 +59,9 @@ export default function EstadoPage() {
 
         <EstadoForm
           paises={paises}
-          onSubmit={handleCreateEstado}
-        />
+          onSubmit={handleCreateEstado} onCancel={function (): void {
+            throw new Error('Function not implemented.')
+          }} />
 
         <section className="bg-light p-4">
 

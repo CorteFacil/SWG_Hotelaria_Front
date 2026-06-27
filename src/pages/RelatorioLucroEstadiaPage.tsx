@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { api } from "../api";
 import {
   Loader2,
   CalendarDays,
@@ -7,10 +6,9 @@ import {
   DollarSign,
   AlertCircle,
   BarChart3,
-  BedDouble,
-  ArrowUpCircle,
-  ArrowDownCircle,
+  BedDouble
 } from "lucide-react";
+import { listarRelatorioLucroEstadia } from "@/Api/relatorios";
 
 export default function RelatorioLucroEstadia() {
   const [dataInicio, setDataInicio] = useState("");
@@ -29,9 +27,11 @@ export default function RelatorioLucroEstadia() {
     setBuscou(true);
 
     try {
-      const dados = await api.getRelatorioLucroEstadia(dataInicio, dataFim);
-      setEstadias(dados?.estadias ?? []);
-      setSomaTotal(Number(dados?.somaTotal ?? 0));
+      const dados = await listarRelatorioLucroEstadia(dataInicio, dataFim)
+      if (dados) {
+        setEstadias(dados?.estadias ?? []);
+        setSomaTotal(Number(dados?.somaTotal ?? 0));
+      }
     } catch (err) {
       let msg = (err as Error).message;
       try {
@@ -45,7 +45,7 @@ export default function RelatorioLucroEstadia() {
         // mantém mensagem original
       }
       setErro(msg);
-      setResultados([]);
+      setEstadias([]);
     } finally {
       setLoading(false);
     }

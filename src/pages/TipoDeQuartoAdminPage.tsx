@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import TipoDeQuartoForm from "../components/TipoDeQuartoForm";
-import { api } from "../api";
 import type { TipoDeQuarto } from "../types";
 import { Loader2, Search, Trash2, AlertTriangle, Edit2, CheckCircle2, Tags, Users, DollarSign } from "lucide-react";
+import { atualizarTipoDeQuarto, criarTipoDeQuarto, excluirTipoDeQuarto, listarTipoDeQuarto } from "@/Api/tiposdequarto";
 
 export default function TipoDeQuartoAdminPage() {
   const [tipos, setTipos] = useState<TipoDeQuarto[]>([]);
-  
+
   const [tipoEditando, setTipoEditando] = useState<TipoDeQuarto | null>(null);
   const [buscaNome, setBuscaNome] = useState("");
-  
+
   const [loadingDados, setLoadingDados] = useState(true);
   const [erroPagina, setErroPagina] = useState("");
   const [sucessoFeedback, setSucessoFeedback] = useState("");
   const [erroForm, setErroForm] = useState("");
 
-  const [itemParaExcluir, setItemParaExcluir] = useState<{id: number, nome: string} | null>(null);
+  const [itemParaExcluir, setItemParaExcluir] = useState<{ id: number, nome: string } | null>(null);
   const [textoConfirmacao, setTextoConfirmacao] = useState("");
   const [deletando, setDeletando] = useState(false);
   const [erroExclusao, setErroExclusao] = useState(""); // Novo estado para erro do modal
@@ -24,7 +24,7 @@ export default function TipoDeQuartoAdminPage() {
 
   async function carregarDados() {
     try {
-      const dados = await api.getTiposDeQuarto();
+      const dados = await listarTipoDeQuarto();
       setTipos(dados);
     } catch (err) {
       setErroPagina("Falha ao carregar os dados. Atualize a página.");
@@ -39,18 +39,18 @@ export default function TipoDeQuartoAdminPage() {
   }
 
   async function handleSubmitForm(data: Omit<TipoDeQuarto, "id">) {
-    setErroForm(""); 
+    setErroForm("");
 
     try {
       if (tipoEditando) {
-        await api.updateTipoDeQuarto(tipoEditando.id, data);
+        await atualizarTipoDeQuarto(String(tipoEditando.id), data);
         mostrarSucesso("Tipo de Quarto atualizado com sucesso!");
       } else {
-        await api.createTipoDeQuarto(data);
+        await criarTipoDeQuarto(data);
         mostrarSucesso("Tipo de Quarto criado com sucesso!");
       }
-      handleCancel(); 
-      carregarDados(); 
+      handleCancel();
+      carregarDados();
     } catch (err) {
       let msg = (err as Error).message;
       try {
@@ -61,10 +61,10 @@ export default function TipoDeQuartoAdminPage() {
           else break;
         }
       } catch (e) { }
-      
-      setErroForm(msg); 
+
+      setErroForm(msg);
       // ISSO AQUI FAZ A MÁGICA DE NÃO APAGAR OS DADOS DO FORMULÁRIO:
-      throw new Error(msg); 
+      throw new Error(msg);
     }
   }
 
@@ -84,7 +84,7 @@ export default function TipoDeQuartoAdminPage() {
     setDeletando(true);
     setErroExclusao("");
     try {
-      await api.deleteTipoDeQuarto(itemParaExcluir.id);
+      await excluirTipoDeQuarto(String(itemParaExcluir.id));
       setTipos(tipos.filter(t => t.id !== itemParaExcluir.id));
       fecharModalExclusao();
       if (tipoEditando?.id === itemParaExcluir.id) handleCancel();
@@ -99,7 +99,7 @@ export default function TipoDeQuartoAdminPage() {
           else break;
         }
       } catch (e) { }
-      
+
       setErroExclusao(msg); // Exibe o erro DENTRO do modal, sem alerts!
     } finally {
       setDeletando(false);
@@ -112,7 +112,7 @@ export default function TipoDeQuartoAdminPage() {
     setErroExclusao("");
   }
 
-  const tiposFiltrados = tipos.filter(t => 
+  const tiposFiltrados = tipos.filter(t =>
     !buscaNome || t.nome.toLowerCase().includes(buscaNome.toLowerCase())
   );
 
@@ -134,11 +134,11 @@ export default function TipoDeQuartoAdminPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start flex-1 overflow-hidden">
-          
+
           <div className="space-y-6 h-full overflow-y-auto custom-scroll pr-2">
-            <TipoDeQuartoForm 
-              tipoEditando={tipoEditando} 
-              error={erroForm} 
+            <TipoDeQuartoForm
+              tipoEditando={tipoEditando}
+              error={erroForm}
               onSubmit={handleSubmitForm}
               onCancel={handleCancel}
             />
@@ -149,8 +149,8 @@ export default function TipoDeQuartoAdminPage() {
               <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Categorias Registradas</h3>
               <div className="relative">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input 
-                  type="text" placeholder="Buscar pelo nome da categoria..." 
+                <input
+                  type="text" placeholder="Buscar pelo nome da categoria..."
                   value={buscaNome} onChange={(e) => setBuscaNome(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] outline-none transition-all text-gray-800"
                 />
@@ -168,7 +168,7 @@ export default function TipoDeQuartoAdminPage() {
                         <Tags size={16} className="text-[#EF9B1B]" /> {tipo.nome}
                       </span>
                     </div>
-                    
+
                     <div className="flex flex-col gap-1.5 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <DollarSign size={14} className="text-emerald-600" />
@@ -204,16 +204,16 @@ export default function TipoDeQuartoAdminPage() {
               <AlertTriangle size={28} />
               <h3 className="text-xl font-bold text-[#222020] font-admin">Excluir Categoria</h3>
             </div>
-            
+
             <p className="text-gray-600 mb-4">
               Tem certeza que deseja excluir <strong>{itemParaExcluir.nome}</strong>?
             </p>
 
             {/* SE DER ERRO NA EXCLUSÃO, APARECE AQUI DENTRO, EM VERMELHO */}
             {erroExclusao && (
-               <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm font-bold border border-red-200">
-                 {erroExclusao}
-               </div>
+              <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm font-bold border border-red-200">
+                {erroExclusao}
+              </div>
             )}
 
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">

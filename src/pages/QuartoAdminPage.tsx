@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import QuartoForm from "../components/QuartoForm";
 
-import { api } from "../api";
-
 import type {
     Quarto,
     TipoDeQuarto
@@ -20,174 +18,95 @@ import {
     Building2,
     Layers
 } from "lucide-react";
+import { atualizarQuarto, criarQuarto, excluirQuarto, listarQuartos } from "@/Api/quartos";
+import { listarTipoDeQuarto } from "@/Api/tiposdequarto";
 
 export default function QuartoAdminPage() {
 
     const [quartos, setQuartos] = useState<Quarto[]>([]);
+    const [tiposDeQuarto, setTiposDeQuarto] = useState<TipoDeQuarto[]>([]);
+    const [quartoEditando, setQuartoEditando] = useState<Quarto | null>(null);
+    const [busca, setBusca] = useState("");
+    const [loadingDados, setLoadingDados] = useState(true);
+    const [erroPagina, setErroPagina] = useState("");
+    const [sucessoFeedback, setSucessoFeedback] = useState("");
 
-    const [tiposDeQuarto, setTiposDeQuarto] =
-        useState<TipoDeQuarto[]>([]);
-
-    const [quartoEditando,
-        setQuartoEditando] =
-        useState<Quarto | null>(null);
-
-    const [busca,
-        setBusca] =
-        useState("");
-
-    const [loadingDados,
-        setLoadingDados] =
-        useState(true);
-
-    const [erroPagina,
-        setErroPagina] =
-        useState("");
-
-    const [sucessoFeedback,
-        setSucessoFeedback] =
-        useState("");
-
-    const [
-        itemParaExcluir,
-        setItemParaExcluir
-    ] = useState<{
+    const [itemParaExcluir, setItemParaExcluir] = useState<{
         id: number,
         numero: string
     } | null>(null);
 
-    const [
-        textoConfirmacao,
-        setTextoConfirmacao
-    ] = useState("");
+    const [textoConfirmacao, setTextoConfirmacao] = useState("");
 
-    const [
-        deletando,
-        setDeletando
-    ] = useState(false);
+    const [deletando, setDeletando] = useState(false);
 
     useEffect(() => {
-
         carregarDados();
-
     }, []);
 
     async function carregarDados() {
-
         try {
-
             const [
-
                 quartosData,
-
                 tiposData
-
             ] = await Promise.all([
-
-                api.getQuartos(),
-
-                api.getTiposDeQuarto()
-
+                listarQuartos(),
+                listarTipoDeQuarto()
             ]);
-
             setQuartos(quartosData);
-
             setTiposDeQuarto(tiposData);
-
         }
-
         catch {
-
             setErroPagina(
-
                 "Falha ao carregar os quartos."
-
             );
-
         }
-
         finally {
-
             setLoadingDados(false);
-
         }
-
     }
 
     function mostrarSucesso(
-
         mensagem: string
-
     ) {
-
         setSucessoFeedback(mensagem);
-
         setTimeout(() => {
-
             setSucessoFeedback("");
-
         }, 3000);
 
     }
 
     async function handleSubmitForm(
-
         data: any
-
     ) {
-
         try {
-
             if (
-
                 quartoEditando
-
             ) {
-
-                await api.updateQuarto(
-
-                    quartoEditando.id,
-
+                await atualizarQuarto(
+                    String(quartoEditando.id),
                     data
-
                 );
-
                 mostrarSucesso(
-
                     "Quarto atualizado com sucesso!"
-
                 );
-
             }
-
             else {
-
-                await api.createQuarto(
-
+                await criarQuarto(
                     data
-
                 );
-
                 mostrarSucesso(
-
                     "Quarto cadastrado com sucesso!"
-
                 );
 
             }
-
             handleCancel();
-
             carregarDados();
-
         }
 
         catch (err) {
-
             alert(
-
                 (err as Error).message
-
             );
 
         }
@@ -195,25 +114,19 @@ export default function QuartoAdminPage() {
     }
 
     function handleCancel() {
-
         setQuartoEditando(null);
 
     }
 
     function handleEditar(
-
         quarto: Quarto
 
     ) {
 
         setQuartoEditando(quarto);
-
         window.scrollTo({
-
             top: 0,
-
             behavior: "smooth"
-
         });
 
     }
@@ -221,21 +134,16 @@ export default function QuartoAdminPage() {
     async function handleConfirmDelete() {
 
         if (
-
             !itemParaExcluir
-
         )
-
             return;
 
         setDeletando(true);
 
         try {
 
-            await api.deleteQuarto(
-
-                itemParaExcluir.id
-
+            await excluirQuarto(
+                String(itemParaExcluir.id)
             );
 
             setQuartos(

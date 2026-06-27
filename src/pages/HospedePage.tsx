@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'wouter'
-import { api } from '../api'
-import type { PaisIso, Estado } from '../types'
+import type { Pais, Estado } from '../types'
 import HospedeForm from '../components/HospedeForm'
 import { UserPlus, CheckCircle2, Loader2 } from 'lucide-react'
+import { listarEstados } from '@/Api/estados'
+import { listarPaises } from '@/Api/paises'
+import { criarHospede } from '@/Api/hospedes'
 
 export default function HospedePage() {
   const [, setLocation] = useLocation() // HOOK DE NAVEGAÇÃO
   const [estados, setEstados] = useState<Estado[]>([])
-  const [paises, setPaises] = useState<PaisIso[]>([])
-  
+  const [paises, setPaises] = useState<Pais[]>([])
+
   const [feedback, setFeedback] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState(true)
@@ -21,8 +23,8 @@ export default function HospedePage() {
   async function loadFormData() {
     try {
       const [loadedEstados, loadedPaises] = await Promise.all([
-        api.getEstados(),
-        api.getPaises(),
+        listarEstados(),
+        listarPaises(),
       ])
       setEstados(loadedEstados)
       setPaises(loadedPaises)
@@ -49,10 +51,10 @@ export default function HospedePage() {
         estado: { id: Number(data.estadoId) }
       };
 
-      await api.createHospede(payloadSeguro)
-      
+      await criarHospede(payloadSeguro)
+
       mostrarSucesso('Cadastro realizado com sucesso!  Redirecionando...')
- 
+
       setTimeout(() => {
         setLocation('/reserva');
       }, 2500);
@@ -62,8 +64,8 @@ export default function HospedePage() {
       try {
         const parsed = JSON.parse(msg);
         if (parsed.message) msg = parsed.message;
-      } catch (e) {}
-      
+      } catch (e) { }
+
       setError(msg);
       throw new Error(msg);
     }
@@ -71,9 +73,9 @@ export default function HospedePage() {
 
   return (
     <div className="min-h-screen bg-[#FFF8EF] font-admin text-[#222020] flex flex-col items-center py-4 px-4 sm:px-6 relative selection:bg-[#EF9B1B]/30">
-      
+
       <div className="w-full max-w-3xl animate-fade-in">
-        
+
         <div className="text-center mb-10">
           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-[#EF9B1B]/20 text-[#EF9B1B]">
             <UserPlus size={36} />
@@ -93,15 +95,15 @@ export default function HospedePage() {
           </div>
         ) : (
           <div className="space-y-6 animate-fade-in">
-            <HospedeForm 
-              estados={estados} 
-              paises={paises} 
-              error={error} 
-              onSubmit={handleCreateHospede} 
+            <HospedeForm
+              estados={estados}
+              paises={paises}
+              error={error}
+              onSubmit={handleCreateHospede}
               onCancel={() => {
                 setError('');
                 window.history.back();
-              }} 
+              }}
             />
           </div>
         )}

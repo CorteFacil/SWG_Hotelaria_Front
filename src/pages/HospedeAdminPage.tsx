@@ -1,25 +1,27 @@
 import { useEffect, useState } from "react";
 import HospedeForm from "../components/HospedeForm";
-import { api } from "../api";
-import type { Hospede, Estado, PaisIso } from "../types";
+import type { Hospede, Estado, Pais } from "../types";
 import { Loader2, Search, Trash2, AlertTriangle, Edit2, CheckCircle2, UserCircle, Phone, MapPin } from "lucide-react";
+import { atualizarHospede, criarHospede, excluirHospede, listarHospedes } from "@/Api/hospedes";
+import { listarEstados } from "@/Api/estados";
+import { listarPaises } from "@/Api/paises";
 
 export default function HospedeAdminPage() {
   const [hospedes, setHospedes] = useState<Hospede[]>([]);
   const [estados, setEstados] = useState<Estado[]>([]);
-  const [paises, setPaises] = useState<PaisIso[]>([]);
-  
+  const [paises, setPaises] = useState<Pais[]>([]);
+
   const [hospedeEditando, setHospedeEditando] = useState<Hospede | null>(null);
   const [busca, setBusca] = useState("");
-  
+
   const [loadingDados, setLoadingDados] = useState(true);
   const [erroPagina, setErroPagina] = useState("");
   const [sucessoFeedback, setSucessoFeedback] = useState("");
   const [erroFeedback, setErroFeedback] = useState("");
-  
+
   const [erroForm, setErroForm] = useState("");
 
-  const [itemParaExcluir, setItemParaExcluir] = useState<{id: number, nome: string} | null>(null);
+  const [itemParaExcluir, setItemParaExcluir] = useState<{ id: number, nome: string } | null>(null);
   const [textoConfirmacao, setTextoConfirmacao] = useState("");
   const [deletando, setDeletando] = useState(false);
 
@@ -28,7 +30,9 @@ export default function HospedeAdminPage() {
   async function carregarDados() {
     try {
       const [hospedesData, estadosData, paisesData] = await Promise.all([
-        api.getHospedes(), api.getEstados(), api.getPaises()
+        listarHospedes(),
+        listarEstados(),
+        listarPaises()
       ]);
       setHospedes(hospedesData);
       setEstados(estadosData);
@@ -52,7 +56,7 @@ export default function HospedeAdminPage() {
 
   async function handleSubmitForm(data: any) {
     setErroForm("");
-    
+
     try {
       const payloadSeguro = {
         ...data,
@@ -62,14 +66,14 @@ export default function HospedeAdminPage() {
       };
 
       if (hospedeEditando) {
-        await api.updateHospede(hospedeEditando.id, payloadSeguro);
+        await atualizarHospede(String(hospedeEditando.id), payloadSeguro);
         mostrarSucesso("Hóspede atualizado com sucesso!");
       } else {
-        await api.createHospede(payloadSeguro);
+        await criarHospede(payloadSeguro);
         mostrarSucesso("Hóspede cadastrado com sucesso!");
       }
-      handleCancel(); 
-      carregarDados(); 
+      handleCancel();
+      carregarDados();
     } catch (err) {
       let msg = (err as Error).message;
       try {
@@ -80,9 +84,9 @@ export default function HospedeAdminPage() {
           else break;
         }
       } catch (e) { }
-      
-      setErroForm(msg); 
-      throw new Error(msg); 
+
+      setErroForm(msg);
+      throw new Error(msg);
     }
   }
 
@@ -101,7 +105,7 @@ export default function HospedeAdminPage() {
     if (!itemParaExcluir) return;
     setDeletando(true);
     try {
-      await api.deleteHospede(itemParaExcluir.id);
+      await excluirHospede(String(itemParaExcluir.id));
       setHospedes(hospedes.filter(h => h.id !== itemParaExcluir.id));
       fecharModalExclusao();
       if (hospedeEditando?.id === itemParaExcluir.id) handleCancel();
@@ -116,7 +120,7 @@ export default function HospedeAdminPage() {
           else break;
         }
       } catch (e) { }
-      
+
       fecharModalExclusao();
       mostrarErro(msg);
     } finally {
@@ -153,12 +157,12 @@ export default function HospedeAdminPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start flex-1 overflow-hidden">
-          
+
           <div className="space-y-6 h-full overflow-y-auto custom-scroll pr-2">
-            <HospedeForm 
+            <HospedeForm
               estados={estados}
               paises={paises}
-              hospedeEditando={hospedeEditando} 
+              hospedeEditando={hospedeEditando}
               error={erroForm}
               onSubmit={handleSubmitForm}
               onCancel={handleCancel}
@@ -170,8 +174,8 @@ export default function HospedeAdminPage() {
               <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Hóspedes Registrados</h3>
               <div className="relative">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input 
-                  type="text" placeholder="Buscar por nome ou CPF..." 
+                <input
+                  type="text" placeholder="Buscar por nome ou CPF..."
                   value={busca} onChange={(e) => setBusca(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] outline-none transition-all text-gray-800"
                 />
@@ -191,7 +195,7 @@ export default function HospedeAdminPage() {
                           <UserCircle size={16} className="text-[#EF9B1B]" /> {hospede.nome}
                         </span>
                       </div>
-                      
+
                       <div className="flex flex-col gap-1.5 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
                           <span className="font-medium bg-gray-100 px-2 py-0.5 rounded text-xs">CPF/Pass: {hospede.cpfPassaporte}</span>

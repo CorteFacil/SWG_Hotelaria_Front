@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { api } from "../api";
 import {
   Loader2,
   CalendarDays,
@@ -211,14 +210,14 @@ export default function RelatorioLucroEstadia() {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {resultados.map((item, index) => {
-                      const nomeHospede    = item.nomeHospede    ?? item.nomehospede    ?? "—";
-                      const numeroQuarto   = item.numeroQuarto   ?? item.numeroquarto   ?? "—";
-                      const checkIn        = item.checkIn        ?? item.checkin        ?? "";
-                      const checkOut       = item.checkOut       ?? item.checkout       ?? "";
-                      const receita        = Number(item.valorTotalEstadia ?? item.valortotalestadia ?? 0);
-                      const custo          = Number(item.custoDiaria       ?? item.custodiaria       ?? 0);
-                      const lucro          = Number(item.lucro ?? 0);
-                      const lucroPositivo  = lucro >= 0;
+                      const nomeHospede = item.nomeHospede ?? item.nomehospede ?? "—";
+                      const numeroQuarto = item.numeroQuarto ?? item.numeroquarto ?? "—";
+                      const checkIn = item.checkIn ?? item.checkin ?? "";
+                      const checkOut = item.checkOut ?? item.checkout ?? "";
+                      const receita = Number(item.valorTotalEstadia ?? item.valortotalestadia ?? 0);
+                      const custo = Number(item.custoDiaria ?? item.custodiaria ?? 0);
+                      const lucro = Number(item.lucro ?? 0);
+                      const lucroPositivo = lucro >= 0;
 
                       return (
                         <tr key={index} className="hover:bg-gray-50 transition-colors">

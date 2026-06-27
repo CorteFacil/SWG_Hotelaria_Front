@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import ReservaForm from "../components/ReservaForm";
-import { api } from "../api";
 import type { Hospede, TipoDeQuarto, Reserva } from "../types";
 import { Loader2, UserCircle, Search, CalendarDays, BedDouble, Trash2, AlertTriangle, Edit2, CheckCircle2, UserPlus } from "lucide-react";
+import { listarHospedes } from "@/Api/hospedes";
+import { listarTipoDeQuarto } from "@/Api/tiposdequarto";
+import { criarReserva, excluirReserva, listarReservas } from "@/Api/reservas";
+import { atualizarEstadia } from "@/Api/estadias";
 
 export default function ReservaAdminPage() {
   const [tipos, setTipos] = useState<TipoDeQuarto[]>([]);
   const [hospedes, setHospedes] = useState<Hospede[]>([]);
   const [reservas, setReservas] = useState<Reserva[]>([]);
-  
+
   const [hospedeSelecionadoId, setHospedeSelecionadoId] = useState<number>(0);
   const [erroSubmitForm, setErroSubmitForm] = useState<string | undefined>(undefined);
-  
+
   // Controle de Edição e Feedback
   const [reservaEditando, setReservaEditando] = useState<Reserva | null>(null);
   const [sucessoFeedback, setSucessoFeedback] = useState(""); // <-- NOVO ESTADO AQUI
@@ -20,7 +23,7 @@ export default function ReservaAdminPage() {
   const [loadingDados, setLoadingDados] = useState(true);
   const [erroPagina, setErroPagina] = useState("");
 
-  const [reservaParaExcluir, setReservaParaExcluir] = useState<{id: number, nomeHospede: string} | null>(null);
+  const [reservaParaExcluir, setReservaParaExcluir] = useState<{ id: number, nomeHospede: string } | null>(null);
   const [textoConfirmacao, setTextoConfirmacao] = useState("");
   const [deletando, setDeletando] = useState(false);
 
@@ -31,9 +34,9 @@ export default function ReservaAdminPage() {
   async function carregarDados() {
     try {
       const [loadedHospedes, loadedTipos, loadedReservas] = await Promise.all([
-        api.getHospedes(),
-        api.getTiposDeQuarto(),
-        api.getReservas()
+        listarHospedes(),
+        listarTipoDeQuarto(),
+        listarReservas()
       ]);
       setHospedes(loadedHospedes);
       setTipos(loadedTipos);
@@ -54,19 +57,19 @@ export default function ReservaAdminPage() {
   }
 
   async function handleSubmitForm(data: any) {
-    setErroSubmitForm(undefined); 
+    setErroSubmitForm(undefined);
 
     try {
       if (reservaEditando) {
-        await api.updateReserva(reservaEditando.id, { ...data, status: reservaEditando.status });
+        await atualizarEstadia(String(reservaEditando.id), { ...data, status: reservaEditando.status });
         mostrarSucesso("Reserva atualizada com sucesso!"); // <-- TROCOU O ALERT
       } else {
-        await api.createReserva({ ...data, status: 0 });
+        await criarReserva({ ...data, status: 0 });
         mostrarSucesso("Reserva criada com sucesso!"); // <-- TROCOU O ALERT
       }
-      
-      handleCancel(); 
-      carregarDados(); 
+
+      handleCancel();
+      carregarDados();
     } catch (err) {
       let mensagemLimpa = (err as Error).message;
       try {
@@ -97,10 +100,10 @@ export default function ReservaAdminPage() {
     if (!reservaParaExcluir) return;
     setDeletando(true);
     try {
-      await api.deleteReserva(reservaParaExcluir.id);
+      await excluirReserva(String(reservaParaExcluir.id));
       setReservas(reservas.filter(r => r.id !== reservaParaExcluir.id));
       fecharModalExclusao();
-      
+
       if (reservaEditando?.id === reservaParaExcluir.id) {
         handleCancel();
       }
@@ -127,7 +130,7 @@ export default function ReservaAdminPage() {
     if (status === 1) {
       const dataSaida = new Date(dataSaidaStr);
       const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0); 
+      hoje.setHours(0, 0, 0, 0);
       if (dataSaida < hoje) {
         return { text: "Realizada", classes: "bg-emerald-100 text-emerald-700 border-emerald-200" };
       } else {
@@ -155,37 +158,37 @@ export default function ReservaAdminPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          
+
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl shadow-lg border border-[#EF9B1B]/20">
-               <label className="text-xs font-medium uppercase tracking-wider text-[#222020] flex items-center gap-2 mb-3">
-                 <UserCircle size={16} className="text-[#EF9B1B]" /> 
-                 Vincular ao Hóspede
-               </label>
-               <select 
-                 value={hospedeSelecionadoId} 
-                 onChange={(e) => setHospedeSelecionadoId(Number(e.target.value))} 
-                 disabled={!!reservaEditando}
-                 className="w-full p-3 rounded-lg bg-[#FFF8EF] border border-[#222020]/20 focus:border-[#EF9B1B] outline-none transition-all text-gray-800 disabled:opacity-60"
-               >
-                 <option value="0" disabled>Busque e selecione o hóspede responsável...</option>
-                 {hospedes.map((h) => (
-                   <option key={h.id} value={h.id}>{h.nome} (CPF/PAS: {h.cpfPassaporte})</option>
-                 ))}
-               </select>
-               {reservaEditando && (
-                 <p className="text-xs text-blue-600 mt-2 font-medium">
-                   Modo de edição ativo. Para alterar o hóspede, cancele a edição e crie uma nova reserva.
-                 </p>
-               )}
+              <label className="text-xs font-medium uppercase tracking-wider text-[#222020] flex items-center gap-2 mb-3">
+                <UserCircle size={16} className="text-[#EF9B1B]" />
+                Vincular ao Hóspede
+              </label>
+              <select
+                value={hospedeSelecionadoId}
+                onChange={(e) => setHospedeSelecionadoId(Number(e.target.value))}
+                disabled={!!reservaEditando}
+                className="w-full p-3 rounded-lg bg-[#FFF8EF] border border-[#222020]/20 focus:border-[#EF9B1B] outline-none transition-all text-gray-800 disabled:opacity-60"
+              >
+                <option value="0" disabled>Busque e selecione o hóspede responsável...</option>
+                {hospedes.map((h) => (
+                  <option key={h.id} value={h.id}>{h.nome} (CPF/PAS: {h.cpfPassaporte})</option>
+                ))}
+              </select>
+              {reservaEditando && (
+                <p className="text-xs text-blue-600 mt-2 font-medium">
+                  Modo de edição ativo. Para alterar o hóspede, cancele a edição e crie uma nova reserva.
+                </p>
+              )}
             </div>
 
             {hospedeSelecionadoId > 0 ? (
-              <ReservaForm 
+              <ReservaForm
                 tipos={tipos}
                 hospedeId={hospedeSelecionadoId}
                 error={erroSubmitForm}
-                reservaEditando={reservaEditando} 
+                reservaEditando={reservaEditando}
                 onSubmit={handleSubmitForm}
                 onCancel={handleCancel}
               />
@@ -210,9 +213,9 @@ export default function ReservaAdminPage() {
               <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Reservas Registradas</h3>
               <div className="relative">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input 
-                  type="text" 
-                  placeholder="Buscar pelo nome do hóspede..." 
+                <input
+                  type="text"
+                  placeholder="Buscar pelo nome do hóspede..."
                   value={buscaNome}
                   onChange={(e) => setBuscaNome(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] outline-none transition-all text-gray-800"
@@ -228,7 +231,7 @@ export default function ReservaAdminPage() {
                   const nomeHospede = hospedes.find(h => h.id === reserva.hospedeId)?.nome || "Desconhecido";
                   const tipoQuarto = tipos.find(t => t.id === reserva.tipoDeQuartoId)?.nome || "Acomodação";
                   const statusInfo = getStatusConfig(reserva.status, reserva.saidaAcomodacao);
-                  
+
                   return (
                     <div key={reserva.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:border-[#EF9B1B]/40 transition-colors relative">
                       <div className="flex justify-between items-start mb-2 pr-20">
@@ -237,7 +240,7 @@ export default function ReservaAdminPage() {
                           {statusInfo.text}
                         </span>
                       </div>
-                      
+
                       <div className="flex flex-col gap-1.5 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
                           <BedDouble size={14} className="text-gray-400" />
@@ -252,14 +255,14 @@ export default function ReservaAdminPage() {
                       </div>
 
                       <div className="absolute top-4 right-4 flex gap-1">
-                        <button 
+                        <button
                           onClick={() => handleCliqueEditar(reserva)}
                           className="p-1.5 text-gray-400 hover:text-[#EF9B1B] hover:bg-[#EF9B1B]/10 rounded-lg transition-all"
                           title="Editar Reserva"
                         >
                           <Edit2 size={18} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => setReservaParaExcluir({ id: reserva.id, nomeHospede })}
                           className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                           title="Cancelar Reserva"
@@ -283,7 +286,7 @@ export default function ReservaAdminPage() {
               <AlertTriangle size={28} />
               <h3 className="text-xl font-bold text-[#222020] font-admin">Cancelar Reserva</h3>
             </div>
-            
+
             <p className="text-gray-600 mb-4">
               Tem certeza que você quer cancelar a reserva de <strong className="text-[#222020]">{reservaParaExcluir.nomeHospede}</strong>? Ela será perdida para sempre e a ação não pode ser desfeita.
             </p>
@@ -292,8 +295,8 @@ export default function ReservaAdminPage() {
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
                 Para confirmar, digite <span className="text-red-500 font-bold select-all">EXCLUIR</span> abaixo:
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={textoConfirmacao}
                 onChange={(e) => setTextoConfirmacao(e.target.value.toUpperCase())}
                 placeholder="EXCLUIR"
@@ -302,13 +305,13 @@ export default function ReservaAdminPage() {
             </div>
 
             <div className="flex gap-3">
-              <button 
+              <button
                 onClick={fecharModalExclusao}
                 className="flex-1 py-3 rounded-xl font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
               >
                 Voltar
               </button>
-              <button 
+              <button
                 onClick={handleConfirmDelete}
                 disabled={textoConfirmacao !== "EXCLUIR" || deletando}
                 className="flex-1 py-3 rounded-xl font-medium bg-red-500 text-white shadow-md hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center"
