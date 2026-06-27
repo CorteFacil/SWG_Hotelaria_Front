@@ -293,12 +293,12 @@ export default function QuartoAdminPage() {
 
         }
 
-        catch {
+        catch(err) {
 
-            alert(
-
-                "Não foi possível excluir."
-
+            fecharModal();
+            
+            mostrarConflito(
+                "Não é possível excluir um quarto ocupado!"
             );
 
         }
@@ -445,7 +445,7 @@ export default function QuartoAdminPage() {
 
                     {/* LISTA */}
 
-                    <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col overflow-hidden sticky top-6 max-h-[75vh]">
+                    <div className="bg-white rounded-xl border border-[#EF9B1B] flex flex-col overflow-hidden sticky top-6 max-h-[75vh]">
 
                         <div className="p-6 border-b border-gray-100 bg-gray-50/50">
 
@@ -638,7 +638,7 @@ export default function QuartoAdminPage() {
 
                             <AlertTriangle size={28} />
 
-                            <h3 className="text-xl font-bold">
+                            <h3 className="text-xl font-bold text-[#222020] font-admin">
 
                                 Excluir Quarto
 
@@ -658,31 +658,33 @@ export default function QuartoAdminPage() {
 
                         </p>
 
-                        <label className="block text-sm mb-2">
+                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
 
-                            Digite <strong>CANCELAR</strong>
+                                Digite <span className="text-red-500 font-bold select-all">EXCLUIR</span>:
 
-                        </label>
+                            </label>
 
-                        <input
+                            <input
 
-                            value={textoConfirmacao}
+                                value={textoConfirmacao}
 
-                            onChange={(e) =>
-                                setTextoConfirmacao(e.target.value)
-                            }
+                                onChange={(e) =>
+                                    setTextoConfirmacao(e.target.value)
+                                }
+                                placeholder="EXCLUIR"
+                                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all text-center font-bold tracking-widest uppercase"
 
-                            className="w-full border rounded-lg p-3"
 
-                        />
-
+                            />
+                        </div>
                         <div className="flex gap-3 mt-6">
 
                             <button
 
                                 onClick={fecharModal}
 
-                                className="flex-1 border rounded-xl py-3"
+                                className="flex-1 border border-gray-200 rounded-xl py-3"
 
                             >
 
@@ -693,7 +695,7 @@ export default function QuartoAdminPage() {
                             <button
 
                                 disabled={
-                                    textoConfirmacao !== "CANCELAR"
+                                    textoConfirmacao !== "EXCLUIR"
                                     || deletando
                                 }
 
