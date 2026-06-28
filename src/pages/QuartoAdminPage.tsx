@@ -203,22 +203,12 @@ export default function QuartoAdminPage() {
 
         catch (err) {
 
-            if ((err as Error).message.includes("Não podem existir dois registros com a mesma chave!")) {
+            mostrarConflito(
 
-                mostrarConflito(
+                (err as Error).message
 
-                    "Não podem existir dois registros com a mesma chave!"
-
-                );
-
-            } else {
-
-                alert(
-
-                    (err as Error).message
-
-                );
-            }
+            );
+            
         }
 
     }
