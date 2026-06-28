@@ -50,10 +50,11 @@ export default function QuartoAdminPage() {
         setSucessoFeedback] =
         useState("");
 
-    const [
-        itemParaExcluir,
-        setItemParaExcluir
-    ] = useState<{
+    const [conflitoFeedback,
+        setConflitoFeedback] =
+        useState("");
+
+    const [itemParaExcluir, setItemParaExcluir] = useState<{
         id: number,
         numero: string
     } | null>(null);
@@ -133,13 +134,19 @@ export default function QuartoAdminPage() {
     }
 
     function mostrarConflito(
+
         mensagem: string
+
     ) {
+
         setConflitoFeedback(mensagem);
+
         setTimeout(() => {
+
             setConflitoFeedback("");
 
         }, 5000);
+
     }
 
     async function handleSubmitForm(
@@ -731,16 +738,27 @@ export default function QuartoAdminPage() {
                 </div>
 
             )}
+
+            {conflitoFeedback && (
+
+                <div className="fixed top-8 right-8 bg-red-50 border border-red-200 rounded-xl px-6 py-4 shadow-lg flex items-center gap-3 z-50">
+
+                    <XCircle
+                        className="text-red-500"
+                    />
+
+                    <span className="text-red-700 font-medium">
+
+                        {conflitoFeedback}
+
+                    </span>
+
+                </div>
+
+            )}
+
         </div>
 
     );
 
 }
-
-function mostrarConflito(arg0: string) {
-    throw new Error("Function not implemented.");
-}
-function setConflitoFeedback(arg0: string) {
-    throw new Error("Function not implemented.");
-}
-
