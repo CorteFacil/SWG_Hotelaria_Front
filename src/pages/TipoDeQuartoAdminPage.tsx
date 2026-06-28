@@ -112,10 +112,17 @@ export default function TipoDeQuartoAdminPage() {
     setErroExclusao("");
   }
 
-  const tiposFiltrados = tipos.filter(t =>
-    !buscaNome || t.nome.toLowerCase().includes(buscaNome.toLowerCase())
+
+  const tiposFiltrados = tipos.filter(t => {
+    if (!buscaNome) return true;
+    const termo = buscaNome.toLowerCase();
+    return (
+      t.nome.toLowerCase().includes(termo)
+    );
+  }
   );
 
+  console.log(buscaNome);
   return (
     <div className="max-w-7xl mx-auto w-full animate-fade-in relative">
       <div className="mb-4">
@@ -172,7 +179,7 @@ export default function TipoDeQuartoAdminPage() {
                     <div className="flex flex-col gap-1.5 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <DollarSign size={14} className="text-emerald-600" />
-                        <span className="font-medium text-emerald-700">R$ {tipo.precoDiaria.toFixed(2)} / diária</span>
+                        <span className="font-medium text-emerald-700">R$ {Number(tipo.precoDiaria)} / diária</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Users size={14} className="text-gray-400" />

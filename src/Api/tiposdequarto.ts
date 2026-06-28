@@ -1,7 +1,7 @@
 import { pedir, ErroHttp } from "./https";
 import type { TipoDeQuarto, TipoDeQuartoPayLoad } from "../types";
 
-const RECURSO = '/estado';
+const RECURSO = '/tipo-de-quarto';
 
 export async function listarTipoDeQuarto(): Promise<TipoDeQuarto[]> {
     const params = new URLSearchParams();

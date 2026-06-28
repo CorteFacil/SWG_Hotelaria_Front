@@ -1,7 +1,7 @@
 import { pedir, ErroHttp } from "./https";
 import type { Estadia, EstadiaPayLoad } from "../types";
 
-const RECURSO = '/Estadia';
+const RECURSO = '/estadia';
 
 export async function listarEstadias(): Promise<Estadia[]> {
     const params = new URLSearchParams();
