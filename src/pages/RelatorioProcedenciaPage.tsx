@@ -111,7 +111,7 @@ export default function RelatorioProcedenciaPage() {
                 </div>
               </div>
 
-              <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-[1.25rem] flex items-center justify-between shadow-sm">
+              {/* <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-[1.25rem] flex items-center justify-between shadow-sm">
                 <div>
                   <p className="text-emerald-700 font-bold uppercase tracking-widest text-xs mb-1">Receita Total</p>
                   <h2 className="text-3xl font-black text-emerald-600 font-admin">{fmt(totalReceita)}</h2>
@@ -119,7 +119,7 @@ export default function RelatorioProcedenciaPage() {
                 <div className="h-12 w-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-500">
                   <DollarSign size={24} />
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
 

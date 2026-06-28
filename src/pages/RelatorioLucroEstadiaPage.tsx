@@ -164,6 +164,7 @@ export default function RelatorioLucroEstadia() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-[#FFF8EF] text-[#C47D0E] text-xs uppercase tracking-wider">
+                      <th className="p-4 font-bold border-b border-[#EF9B1B]/20">ID</th>
                       <th className="p-4 font-bold border-b border-[#EF9B1B]/20">Hóspede</th>
                       <th className="p-4 font-bold border-b border-[#EF9B1B]/20">Quarto</th>
                       <th className="p-4 font-bold border-b border-[#EF9B1B]/20 text-center">Data Saída</th>
@@ -173,6 +174,7 @@ export default function RelatorioLucroEstadia() {
                   <tbody className="divide-y divide-gray-100">
                     {estadias.map((item) => (
                       <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="p-4 text-sm font-bold text-[#222020]">{item.id ?? "—"}</td>
                         <td className="p-4 text-sm font-bold text-[#222020]">{item.hospede ?? "—"}</td>
                         <td className="p-4 text-sm text-gray-600">
                           <span className="flex items-center gap-1.5">
