@@ -100,10 +100,15 @@ export type EstadiaPayLoad = Omit<Estadia, 'id'>
 export interface Funcionario {
   id: number
   nome: string
-  email: string
+  data_nascimento: string
+  cpf: string
+  bairro: string
+  cidade: string
+  rua: string
   telefone: string
-  cargo: string
-  salario: number
+  paisisoId: number
+  login: string
+  senha: string
 }
 
 export type FuncionarioPayLoad = Omit<Funcionario, 'id'>

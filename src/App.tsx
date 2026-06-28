@@ -28,6 +28,8 @@ import EstadoAdminPage from "./pages/EstadoAdminPage";
 import QuartoAdminPage from "./pages/QuartoAdminPage";
 import RelatorioLucroEstadiaPage from "./pages/RelatorioLucroEstadiaPage";
 import RelatorioProcedenciaPage from "./pages/RelatorioProcedenciaPage";
+import PaisAdminPage from "./pages/PaisAdminPage";
+import RelatorioOrdemLimpezaPage from "./pages/RelatorioOrdemLimpezaPage";
 
 const queryClient = new QueryClient();
 
@@ -40,7 +42,7 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       {/* <Route path="/estado" component={EstadoPage} /> */}
       {/* <Route path="/estadia" component={EstadiaPage} />  */}
-      
+
       <Route path="/admin">
         <AdminPage><DashboardHome /></AdminPage>
       </Route>
@@ -71,6 +73,9 @@ function Router() {
       <Route path="/admin/estado">
         <AdminPage><EstadoAdminPage /></AdminPage>
       </Route>
+      <Route path="/admin/pais">
+        <AdminPage><PaisAdminPage /></AdminPage>
+      </Route>
       <Route path="/admin/Estadia">
         <AdminPage><EstadiaAdminPage /></AdminPage>
       </Route>
@@ -79,6 +84,9 @@ function Router() {
       </Route>
       <Route path="/admin/relatorios/relatorio-procedencia">
         <AdminPage><RelatorioProcedenciaPage /></AdminPage>
+      </Route>
+      <Route path="/admin/relatorios/historico-limpeza">
+        <AdminPage><RelatorioOrdemLimpezaPage /></AdminPage>
       </Route>
 
       <Route component={NotFound} />

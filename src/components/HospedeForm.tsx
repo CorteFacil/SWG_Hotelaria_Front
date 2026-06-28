@@ -1,12 +1,12 @@
 import { useState, type FormEvent, useEffect } from 'react';
 import { UserCircle, FileText, Phone, Mail, CalendarDays, Globe, MapPin, AlertCircle } from 'lucide-react';
-import type { Estado, PaisIso } from '../types';
+import type { Estado, Pais } from '../types';
 
 interface HospedeFormProp {
   estados: Estado[]
-  paises: PaisIso[] 
-  initialDoc?: string 
-  error?: string 
+  paises: Pais[]
+  initialDoc?: string
+  error?: string
   hospedeEditando?: any
   onSubmit: (data: any) => Promise<void> | void
   onCancel: () => void
@@ -20,7 +20,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
   const [telefone, setTelefone] = useState('');
   const [nascimento, setNascimento] = useState('');
   const [estadoId, setEstadoId] = useState('');
-  const [paisId, setPaisId] = useState(''); 
+  const [paisId, setPaisId] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -29,17 +29,17 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
       setCpfPassaporte(hospedeEditando.cpfPassaporte || '')
       setEmail(hospedeEditando.email || '')
       setTelefone(hospedeEditando.telefone || '')
-      
+
       const formatData = (dataStr: string) => dataStr ? dataStr.split('T')[0] : '';
       setNascimento(formatData(hospedeEditando.nascimento))
-      
+
       setEstadoId(String(hospedeEditando.estadoId || ''))
-      
+
       if (hospedeEditando.estadoId && estados.length > 0) {
-          const estadoVinculado = estados.find(e => e.id === hospedeEditando.estadoId);
-          if (estadoVinculado && estadoVinculado.paisisoId) {
-            setPaisId(String(estadoVinculado.paisisoId));
-          }
+        const estadoVinculado = estados.find(e => e.id === hospedeEditando.estadoId);
+        if (estadoVinculado && estadoVinculado.paisisoId) {
+          setPaisId(String(estadoVinculado.paisisoId));
+        }
       }
     } else {
       setNome('')
@@ -51,7 +51,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
       setEstadoId('')
       setPaisId('')
     }
-  }, [hospedeEditando, initialDoc, estados]); 
+  }, [hospedeEditando, initialDoc, estados]);
 
   const extrairSentencas = (texto: string) => {
     if (!texto) return [];
@@ -61,7 +61,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
   const getErro = (palavrasChave: string[]) => {
     if (!error) return null;
     const sentencas = extrairSentencas(error);
-    const encontradas = sentencas.filter(s => 
+    const encontradas = sentencas.filter(s =>
       palavrasChave.some(p => s.toLowerCase().includes(p.toLowerCase()))
     );
     return encontradas.length > 0 ? encontradas.join(' ').trim() : null;
@@ -87,7 +87,7 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
       v = v.replace(/(\d{3})(\d)/, '$1.$2');
       v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     } else {
-      v = v.toUpperCase().replace(/[^A-Z0-9]/g, ''); 
+      v = v.toUpperCase().replace(/[^A-Z0-9]/g, '');
       if (v.length > 15) v = v.slice(0, 15);
     }
     setCpfPassaporte(v);
@@ -125,14 +125,14 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
-    
+
     try {
       await onSubmit({
         nome, cpfPassaporte, email, telefone, nascimento,
         estadoId: Number(estadoId),
         paisId: Number(paisId)
       });
-      
+
       if (!hospedeEditando) {
         setNome('');
         setCpfPassaporte(initialDoc);
@@ -159,15 +159,14 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+
           <div className="space-y-2">
             <label className="text-xs font-bold text-[#C47D0E] uppercase tracking-wider">Nome Completo</label>
             <div className="relative">
               <UserCircle size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input value={nome} onChange={(e) => setNome(e.target.value)} required type="text" placeholder="Ex: João da Silva"
-                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
-                  erroNome ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
-                }`} />
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${erroNome ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                  }`} />
             </div>
             {erroNome && <span className="text-xs text-red-500 font-medium block mt-1">{erroNome}</span>}
           </div>
@@ -183,9 +182,8 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
             <div className="relative">
               <FileText size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input value={cpfPassaporte} onChange={handleDocChange} required type="text" placeholder={tipoDoc === 'CPF' ? "999.999.999-99" : "Letras e Números"}
-                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
-                  erroDoc ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
-                }`} />
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${erroDoc ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                  }`} />
             </div>
             {erroDoc && <span className="text-xs text-red-500 font-medium block mt-1">{erroDoc}</span>}
           </div>
@@ -195,9 +193,8 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
             <div className="relative">
               <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input value={telefone} onChange={handleTelefoneChange} required type="text" placeholder="(99) 99999-9999"
-                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
-                  erroTel ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
-                }`} />
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${erroTel ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                  }`} />
             </div>
             {erroTel && <span className="text-xs text-red-500 font-medium block mt-1">{erroTel}</span>}
           </div>
@@ -207,9 +204,8 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
             <div className="relative">
               <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" placeholder="seu@email.com"
-                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
-                  erroEmail ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
-                }`} />
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${erroEmail ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                  }`} />
             </div>
             {erroEmail && <span className="text-xs text-red-500 font-medium block mt-1">{erroEmail}</span>}
           </div>
@@ -219,9 +215,8 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
             <div className="relative">
               <CalendarDays size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input value={nascimento} onChange={(e) => setNascimento(e.target.value)} required type="date"
-                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${
-                  erroNasc ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
-                }`} />
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 outline-none transition-all text-gray-800 ${erroNasc ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : 'border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B]'
+                  }`} />
             </div>
             {erroNasc && <span className="text-xs text-red-500 font-medium block mt-1">{erroNasc}</span>}
           </div>
@@ -245,13 +240,12 @@ export default function HospedeForm({ estados, paises, initialDoc = '', error, h
             <div className="relative">
               <MapPin size={18} className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${paisId ? 'text-gray-400' : 'text-gray-300'}`} />
               <select value={estadoId} onChange={(e) => setEstadoId(e.target.value)} required disabled={!paisId}
-                className={`w-full pl-11 pr-4 py-3 rounded-xl border outline-none transition-all appearance-none ${
-                  !paisId 
+                className={`w-full pl-11 pr-4 py-3 rounded-xl border outline-none transition-all appearance-none ${!paisId
                     ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
-                    : erroEstado 
-                      ? 'bg-gray-50 focus:bg-white focus:ring-2 border-red-400 focus:ring-red-400/40 focus:border-red-500 text-gray-800' 
+                    : erroEstado
+                      ? 'bg-gray-50 focus:bg-white focus:ring-2 border-red-400 focus:ring-red-400/40 focus:border-red-500 text-gray-800'
                       : 'bg-gray-50 focus:bg-white focus:ring-2 border-gray-200 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] text-gray-800'
-                }`}>
+                  }`}>
                 <option value="">{paisId ? "Selecione um estado" : "Selecione o país primeiro"}</option>
                 {estadosFiltrados.map((estado) => <option key={estado.id} value={estado.id}>{estado.nomeEstado} - {estado.siglaUf}</option>)}
               </select>

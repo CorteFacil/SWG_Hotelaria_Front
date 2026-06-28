@@ -31,25 +31,18 @@ export default function QuartoAdminPage() {
     const [loadingDados, setLoadingDados] = useState(true);
     const [erroPagina, setErroPagina] = useState("");
     const [sucessoFeedback, setSucessoFeedback] = useState("");
+    const [conflitoFeedback, setConflitoFeedback] = useState("");
 
-    const [conflitoFeedback,
-        setConflitoFeedback] =
-        useState("");
+    const [itemParaExcluir, setItemParaExcluir] = useState<{
+        id: number,
+        numero: string
+    } | null>(null);
 
-    const [
-        itemParaExcluir,
-        setItemParaExcluir
-    ] = useState < {
-        const [itemParaExcluir, setItemParaExcluir] = useState<{
-            id: number,
-            numero: string
-        } | null>(null);
+    const [textoConfirmacao, setTextoConfirmacao] = useState("");
 
-        const [textoConfirmacao, setTextoConfirmacao] = useState("");
+    const [deletando, setDeletando] = useState(false);
 
-        const [deletando, setDeletando] = useState(false);
-
-        useEffect(() => {
+    useEffect(() => {
         carregarDados();
     }, []);
 
@@ -666,4 +659,8 @@ export default function QuartoAdminPage() {
 
     );
 
+}
+
+function mostrarConflito(arg0: string) {
+    throw new Error("Function not implemented.");
 }
