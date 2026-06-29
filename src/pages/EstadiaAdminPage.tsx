@@ -17,7 +17,8 @@ import {
   UserCircle,
   DollarSign,
   UserPlus,
-  BookOpenCheck
+  BookOpenCheck,
+  XCircle
 } from "lucide-react";
 
 export default function EstadiaAdminPage() {
@@ -29,6 +30,7 @@ export default function EstadiaAdminPage() {
   const [estadiaEditando, setEstadiaEditando] = useState<Estadia | null>(null);
   const [erroSubmitForm, setErroSubmitForm] = useState<string | undefined>(undefined);
   const [sucessoFeedback, setSucessoFeedback] = useState("");
+  const [conflitoFeedback, setConflitoFeedback] = useState("");
 
   const [busca, setBusca] = useState("");
   const [loadingDados, setLoadingDados] = useState(true);
@@ -62,8 +64,13 @@ export default function EstadiaAdminPage() {
 
   function mostrarSucesso(mensagem: string) {
     setSucessoFeedback(mensagem);
-    setTimeout(() => setSucessoFeedback(""), 3000);
+    setTimeout(() => setSucessoFeedback(""), 5000);
   }
+
+  function mostrarConflito(mensagem: string) {
+        setConflitoFeedback(mensagem);
+        setTimeout(() => { setConflitoFeedback(""); }, 5000);
+    }
 
   async function handleSubmitForm(data: any) {
     setErroSubmitForm(undefined);
@@ -80,6 +87,7 @@ export default function EstadiaAdminPage() {
     } catch (err) {
       let msg = (err as Error).message;
       try { const p = JSON.parse(msg); if (p?.message) msg = p.message; } catch { /* ignora */ }
+      mostrarConflito("Existe uma ordem de limpeza em andamento para este quarto!");
       setErroSubmitForm(msg);
     }
   }
@@ -176,7 +184,7 @@ export default function EstadiaAdminPage() {
             {/* COLUNA ESQUERDA — Formulário */}
             {reservaSelecionadaId > 0 ? (
               <EstadiaForm
-                reservas={reservas}
+                reservaSelecionadaId={reservaSelecionadaId}
                 funcionarios={funcionarios}
                 quartos={quartos}
                 error={erroSubmitForm}
@@ -199,149 +207,155 @@ export default function EstadiaAdminPage() {
             )}
           </div>
 
-            {/* COLUNA DIREITA — Lista */}
-            <div className="bg-white rounded-[1.25rem] shadow-[0_8px_30px_rgba(34,32,32,0.04)] border border-[#EF9B1B] flex flex-col overflow-hidden sticky top-6 max-h-[80vh]">
-              <div className="p-6 border-b border-gray-100">
-                <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Estadias Registradas</h3>
-                <div className="relative">
-                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Buscar por hóspede, quarto ou funcionário..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] outline-none transition-all text-gray-800"
-                  />
-                </div>
+          {/* COLUNA DIREITA — Lista */}
+          <div className="bg-white rounded-[1.25rem] shadow-[0_8px_30px_rgba(34,32,32,0.04)] border border-[#EF9B1B] flex flex-col overflow-hidden sticky top-6 max-h-[80vh]">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-[#222020] font-admin mb-4">Estadias Registradas</h3>
+              <div className="relative">
+                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar por hóspede, quarto ou funcionário..."
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#EF9B1B]/40 focus:border-[#EF9B1B] outline-none transition-all text-gray-800"
+                />
               </div>
+            </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {estadiasFiltradas.length === 0 ? (
-                  <p className="text-center text-gray-400 py-12 text-sm">Nenhuma estadia encontrada.</p>
-                ) : (
-                  estadiasFiltradas.map((estadia) => {
-                    const nomeHospede =
-                      estadia.reserva?.hospede?.nome ??
-                      reservas.find((r) => r.id === estadia.reservaId)?.hospede?.nome ??
-                      `Reserva #${estadia.reservaId}`;
-                    const numeroQuarto =
-                      estadia.quarto?.numero ??
-                      quartos.find((q) => q.id === estadia.quartoId)?.numero ??
-                      `${estadia.quartoId}`;
-                    const nomeFuncionario =
-                      estadia.funcionario?.nome ??
-                      funcionarios.find((f) => f.id === estadia.funcionarioId)?.nome ??
-                      "—";
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {estadiasFiltradas.length === 0 ? (
+                <p className="text-center text-gray-400 py-12 text-sm">Nenhuma estadia encontrada.</p>
+              ) : (
+                estadiasFiltradas.map((estadia) => {
+                  const nomeHospede =
+                    estadia.reserva?.hospede?.nome ??
+                    reservas.find((r) => r.id === estadia.reservaId)?.hospede?.nome ??
+                    `Reserva #${estadia.reservaId}`;
+                  const numeroQuarto =
+                    estadia.quarto?.numero ??
+                    quartos.find((q) => q.id === estadia.quartoId)?.numero ??
+                    `${estadia.quartoId}`;
+                  const nomeFuncionario =
+                    estadia.funcionario?.nome ??
+                    funcionarios.find((f) => f.id === estadia.funcionarioId)?.nome ??
+                    "—";
 
-                    return (
-                      <div
-                        key={estadia.id}
-                        className="bg-gray-50 hover:bg-white p-4 rounded-xl border border-gray-100 hover:border-[#EF9B1B]/40 hover:shadow-sm transition-all relative"
-                      >
-                        {/* Hóspede via reserva */}
-                        <div className="flex items-center gap-2 mb-3 pr-16">
-                          <UserCircle size={16} className="text-[#EF9B1B] shrink-0" />
-                          <span className="font-bold text-[#222020] truncate">{nomeHospede}</span>
-                          <span className="text-xs text-gray-400 shrink-0">· Reserva #{estadia.reservaId}</span>
+                  return (
+                    <div
+                      key={estadia.id}
+                      className="bg-gray-50 hover:bg-white p-4 rounded-xl border border-gray-100 hover:border-[#EF9B1B]/40 hover:shadow-sm transition-all relative"
+                    >
+                      {/* Hóspede via reserva */}
+                      <div className="flex items-center gap-2 mb-3 pr-16">
+                        <UserCircle size={16} className="text-[#EF9B1B] shrink-0" />
+                        <span className="font-bold text-[#222020] truncate">{nomeHospede}</span>
+                        <span className="text-xs text-gray-400 shrink-0">· Reserva #{estadia.reservaId}</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-gray-600">
+                        <div className="flex items-center gap-1.5">
+                          <BedDouble size={13} className="text-gray-400 shrink-0" />
+                          <span>Quarto {numeroQuarto}</span>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-gray-600">
-                          <div className="flex items-center gap-1.5">
-                            <BedDouble size={13} className="text-gray-400 shrink-0" />
-                            <span>Quarto {numeroQuarto}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <DollarSign size={13} className="text-gray-400 shrink-0" />
-                            <span className="font-semibold text-emerald-700">
-                              {fmtDinheiro(Number(estadia.valorTotalEstadia))}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1.5 col-span-2">
-                            <CalendarDays size={13} className="text-gray-400 shrink-0" />
-                            <span>{fmtData(estadia.checkIn)} → {fmtData(estadia.checkOut)}</span>
-                            <span className="text-gray-400">· {nomeFuncionario}</span>
-                          </div>
+                        <div className="flex items-center gap-1.5">
+                          <DollarSign size={13} className="text-gray-400 shrink-0" />
+                          <span className="font-semibold text-emerald-700">
+                            {fmtDinheiro(Number(estadia.valorTotalEstadia))}
+                          </span>
                         </div>
-
-                        <div className="absolute top-3 right-3 flex gap-1">
-                          <button
-                            onClick={() => handleCliqueEditar(estadia)}
-                            className="p-1.5 text-gray-400 hover:text-[#EF9B1B] hover:bg-[#EF9B1B]/10 rounded-lg transition-all"
-                            title="Editar"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button
-                            onClick={() => setEstadiaParaExcluir({
-                              id: estadia.id,
-                              label: `${nomeHospede} (Quarto ${numeroQuarto})`,
-                            })}
-                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            title="Excluir"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                        <div className="flex items-center gap-1.5 col-span-2">
+                          <CalendarDays size={13} className="text-gray-400 shrink-0" />
+                          <span>{fmtData(estadia.checkIn)} → {estadia.checkOut == null ? "Não definido" : fmtData(estadia.checkOut)}</span>
+                          <span className="text-gray-400">· {nomeFuncionario}</span>
                         </div>
                       </div>
-                    );
-                  })
-                )}
-              </div>
+
+                      <div className="absolute top-3 right-3 flex gap-1">
+                        <button
+                          onClick={() => handleCliqueEditar(estadia)}
+                          className="p-1.5 text-gray-400 hover:text-[#EF9B1B] hover:bg-[#EF9B1B]/10 rounded-lg transition-all"
+                          title="Editar"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          onClick={() => setEstadiaParaExcluir({
+                            id: estadia.id,
+                            label: `${nomeHospede} (Quarto ${numeroQuarto})`,
+                          })}
+                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                          title="Excluir"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
+        </div>
       )}
 
-          {/* MODAL DE EXCLUSÃO */}
-          {estadiaParaExcluir && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-red-100">
-                <div className="flex items-center gap-3 text-red-500 mb-4">
-                  <AlertTriangle size={28} />
-                  <h3 className="text-xl font-bold text-[#222020] font-admin">Excluir Estadia</h3>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  Tem certeza que deseja excluir a estadia de{" "}
-                  <strong className="text-[#222020]">{estadiaParaExcluir.label}</strong>?
-                  Esta ação não pode ser desfeita.
-                </p>
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-                    Digite <span className="text-red-500 select-all">CANCELAR</span> para confirmar:
-                  </label>
-                  <input
-                    type="text"
-                    value={textoConfirmacao}
-                    onChange={(e) => setTextoConfirmacao(e.target.value)}
-                    placeholder="CANCELAR"
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all text-center font-bold tracking-widest uppercase"
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={fecharModalExclusao}
-                    className="flex-1 py-3 rounded-xl font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    onClick={handleConfirmDelete}
-                    disabled={textoConfirmacao !== "CANCELAR" || deletando}
-                    className="flex-1 py-3 rounded-xl font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center"
-                  >
-                    {deletando ? <Loader2 size={20} className="animate-spin" /> : "Sim, Excluir"}
-                  </button>
-                </div>
-              </div>
+      {/* MODAL DE EXCLUSÃO */}
+      {estadiaParaExcluir && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-red-100">
+            <div className="flex items-center gap-3 text-red-500 mb-4">
+              <AlertTriangle size={28} />
+              <h3 className="text-xl font-bold text-[#222020] font-admin">Excluir Estadia</h3>
             </div>
-          )}
-
-          {/* TOAST DE SUCESSO */}
-          {sucessoFeedback && (
-            <div className="fixed top-8 right-8 z-50 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-xl shadow-lg">
-              <CheckCircle2 size={24} className="text-emerald-500 shrink-0" />
-              <p className="font-medium font-admin">{sucessoFeedback}</p>
+            <p className="text-gray-600 mb-4">
+              Tem certeza que deseja excluir a estadia de{" "}
+              <strong className="text-[#222020]">{estadiaParaExcluir.label}</strong>?
+            </p>
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                Digite <span className="text-red-500 select-all">EXCLUIR</span> para confirmar:
+              </label>
+              <input
+                type="text"
+                value={textoConfirmacao}
+                onChange={(e) => setTextoConfirmacao(e.target.value)}
+                placeholder="EXCLUIR"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all text-center font-bold tracking-widest uppercase"
+              />
             </div>
-          )}
+            <div className="flex gap-3">
+              <button
+                onClick={fecharModalExclusao}
+                className="flex-1 py-3 rounded-xl font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={textoConfirmacao !== "EXCLUIR" || deletando}
+                className="flex-1 py-3 rounded-xl font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center"
+              >
+                {deletando ? <Loader2 size={20} className="animate-spin" /> : "Sim, Excluir"}
+              </button>
+            </div>
+          </div>
         </div>
-      );
+      )}
+
+      {/* TOAST DE SUCESSO */}
+      {sucessoFeedback && (
+        <div className="fixed top-8 right-8 z-50 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-xl shadow-lg">
+          <CheckCircle2 size={24} className="text-emerald-500 shrink-0" />
+          <p className="font-medium font-admin">{sucessoFeedback}</p>
+        </div>
+      )}
+
+      {conflitoFeedback && (
+        <div className="fixed top-8 right-8 bg-red-50 border border-red-200 rounded-xl px-6 py-4 shadow-lg flex items-center gap-3 z-50">
+          <XCircle className="text-red-500"/>
+          <span className="text-red-700 font-medium">{conflitoFeedback}</span>
+        </div>
+      )}
+    </div>
+  );
 }

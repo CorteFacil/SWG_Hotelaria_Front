@@ -208,7 +208,7 @@ export default function QuartoAdminPage() {
                 (err as Error).message
 
             );
-            
+
         }
 
     }
@@ -286,7 +286,7 @@ export default function QuartoAdminPage() {
             fecharModal();
 
             mostrarConflito(
-                "Não é possível excluir um quarto ocupado!"
+                (err as Error).message
             );
 
         }
