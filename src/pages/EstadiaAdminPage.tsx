@@ -78,17 +78,24 @@ export default function EstadiaAdminPage() {
       if (estadiaEditando) {
         await atualizarEstadia(String(estadiaEditando.id), data);
         mostrarSucesso("Estadia atualizada com sucesso!");
-      } else {
+        await carregarDados();
+        handleCancel();
+      } else {  
         await criarEstadia(data);
         mostrarSucesso("Estadia registrada com sucesso!");
+        await carregarDados();
+        handleCancel();
       }
-      await carregarDados();
-      handleCancel();
     } catch (err) {
       let msg = (err as Error).message;
       try { const p = JSON.parse(msg); if (p?.message) msg = p.message; } catch { /* ignora */ }
-      mostrarConflito("Existe uma ordem de limpeza em andamento para este quarto!");
-      setErroSubmitForm(msg);
+      if (estadiaEditando) {
+        // No checkout, mostra toast vermelho em vez de erro no form
+        mostrarConflito(msg);
+      } else {
+        mostrarConflito(msg);
+        setErroSubmitForm(msg);
+      }
     }
   }
 
@@ -351,9 +358,9 @@ export default function EstadiaAdminPage() {
       )}
 
       {conflitoFeedback && (
-        <div className="fixed top-8 right-8 bg-red-50 border border-red-200 rounded-xl px-6 py-4 shadow-lg flex items-center gap-3 z-50">
-          <XCircle className="text-red-500"/>
-          <span className="text-red-700 font-medium">{conflitoFeedback}</span>
+        <div className="fixed top-8 right-8 z-50 flex items-center gap-3 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl shadow-lg">
+          <XCircle size={24} className="text-red-500 shrink-0" />
+          <p className="font-medium font-admin">{conflitoFeedback}</p>
         </div>
       )}
     </div>
